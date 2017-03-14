@@ -1,5 +1,6 @@
 var gulp = require('gulp');
 var del = require('del');
+var nodemon = require('gulp-nodemon');
 
 gulp.task('clean', function() {
   return del('build');
@@ -21,4 +22,10 @@ gulp.task('html', function() {
 });
 
 gulp.task('generate', ['js', 'svg', 'html'], function() {
+});
+
+gulp.task('server', ['generate'], function() {
+  return nodemon({
+    script: 'src/server/index.js'
+  });
 });

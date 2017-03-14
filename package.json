@@ -21,5 +21,8 @@
     "express": "^4.15.2",
     "gulp": "^3.9.1",
     "requirejs": "^2.3.3"
+  },
+  "devDependencies": {
+    "gulp-nodemon": "^2.2.1"
   }
 }
