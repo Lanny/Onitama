@@ -1,0 +1,24 @@
+{
+  "name": "onitama",
+  "version": "1.0.0",
+  "description": "Inspired by (but not affiliated with) the Arcane Wonders board game",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RyanJenkins/Onitama.git"
+  },
+  "author": "Ryan \"Lanny\" Jenkins",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/RyanJenkins/Onitama/issues"
+  },
+  "homepage": "https://github.com/RyanJenkins/Onitama#readme",
+  "dependencies": {
+    "express": "^4.15.2",
+    "gulp": "^3.9.1",
+    "requirejs": "^2.3.3"
+  }
+}
