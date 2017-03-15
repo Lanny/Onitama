@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap() {
+  function wrap(cards) {
     var WHITE = 0,
       BLACK = 1;
 
@@ -10,7 +10,7 @@
 
     function shuffle(arr) {
       // clone and FY shuffle an array
-      arr = arr.slice()
+      arr = arr.slice();
 
       var j, tmp;
       for (var i=arr.length - 1; i>0; i--) {
@@ -28,10 +28,10 @@
     }
 
     Piece.prototype = {
-      getColor: {
+      getColor: function() {
         return this._color;
       },
-      getType: {
+      getType: function() {
         if (this instanceof Student) {
           return 'STUDENT';
         } else if (this instanceof Master) {
@@ -40,7 +40,7 @@
           throw new Error('Wat?');
         }
       }
-    }
+    };
 
     function Student(color) {
       Piece.call(this, color);
@@ -96,7 +96,9 @@
       GameState: GameState,
       Student: Student,
       Master: Master
-    }
+    };
+
+    return Module;
   }
 
   define([

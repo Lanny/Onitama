@@ -1,33 +1,33 @@
 ;(function() {
   function wrap() {
-    function const(value) {
+    function constVal(value) {
       var f = function() {
         return value;
       };
 
-      return f
+      return f;
     }
 
     var cards = [
       {
         name: 'Tiger',
-        getMoves: const([[0, 2], [0, -1]])
+        getMoves: constVal([[0, 2], [0, -1]])
       },
       {
         name: 'Monkey',
-        getMoves: const([[1, 1], [1, -1], [-1, 1], [1, -1]])
+        getMoves: constVal([[1, 1], [1, -1], [-1, 1], [1, -1]])
       },
       {
         name: 'Horse',
-        getMoves: const([[1,0], [0, 1], [0, -1]])
+        getMoves: constVal([[1,0], [0, 1], [0, -1]])
       },
       {
         name: 'Crane',
-        getMoves: const([[0,1], [-1, 1], [-1, -1]])
+        getMoves: constVal([[0,1], [-1, 1], [-1, -1]])
       },
       {
         name: 'Elephant',
-        getMoves: const([[1,0], [1,1], [-1,0], [-1,1]])
+        getMoves: constVal([[1,0], [1,1], [-1,0], [-1,1]])
       }
     ];
 

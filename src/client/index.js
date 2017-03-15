@@ -1,6 +1,10 @@
 ;(function() {
-  require(['perspective'], function(Perspective) {
-    var svg = document.getElementById('game-board');
-    var perspective = new Perspective('WHITE', svg);
+  require([
+    'game',
+    'perspective'
+  ], function(game, Perspective) {
+    var gameState = new game.GameState(),
+      svg = document.getElementById('game-board'),
+      perspective = new Perspective(gameState, 'BLACK', svg);
   });
 })();
