@@ -39,6 +39,9 @@
         } else {
           throw new Error('Wat?');
         }
+      },
+      getSvgPath: function() {
+        throw Error('Not Implemented');
       }
     };
 
@@ -46,11 +49,17 @@
       Piece.call(this, color);
     }
     Student.prototype = new Piece();
+    Student.prototype.getSvgPath = function() {
+      return 'svg/' + ((this._color === WHITE) ? 'white' : 'black') + '-pawn.svg';
+    };
 
     function Master(color) {
       Piece.call(this, color);
     }
     Master.prototype = new Piece();
+    Master.prototype.getSvgPath = function() {
+      return 'svg/' + ((this._color === WHITE) ? 'white' : 'black') + '-king.svg';
+    };
 
     function GameState() {
       this.board = null;
@@ -64,23 +73,11 @@
     GameState.prototype = {
       init: function() {
         this.board = [
-          [
-            new Student(BLACK),
-            new Student(BLACK),
-            new Master(BLACK),
-            new Student(BLACK),
-            new Student(BLACK),
-          ],
-          new Array(5),
-          new Array(5),
-          new Array(5),
-          [
-            new Student(WHITE),
-            new Student(WHITE),
-            new Master(WHITE),
-            new Student(WHITE),
-            new Student(WHITE),
-          ]
+          [ new Student(WHITE), null, null, null, new Student(BLACK) ],
+          [ new Student(WHITE), null, null, null, new Student(BLACK) ],
+          [ new Master(WHITE), null, null, null, new Master(BLACK) ],
+          [ new Student(WHITE), null, null, null, new Student(BLACK) ],
+          [ new Student(WHITE), null, null, null, new Student(BLACK) ],
         ];
 
         var deck = shuffle(cards.deck).splice(0, 5);
@@ -89,6 +86,23 @@
         this.blackHand.push(drawCard(deck));
         this.blackHand.push(drawCard(deck));
         this.transferSlot = drawCard(deck);
+      },
+      getPieces: function() {
+        var pieces = [];
+
+        for (var x=0; x<5; x++) {
+          for (var y=0; y<5; y++) {
+            if (this.board[x][y] instanceof Piece) {
+              pieces.push({
+                piece: this.board[x][y],
+                x: x,
+                y: y
+              });
+            }
+          }
+        }
+
+        return pieces;
       }
     };
 

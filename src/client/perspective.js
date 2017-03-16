@@ -1,30 +1,28 @@
 ;(function() {
-  function wrap(d3) {
+  function wrap(d3, game) {
     function Perspective(gameState, color, svg) {
       this.gameState = gameState;
       this.color = color;
       this.svg = d3.select(svg);
 
-      this._perspectiveCoords = [];
-      this._cells = [];
-      var b = (this.color === 'WHITE') ? 0 : 4,
-        m = (this.color === 'WHITE') ? 1 : -1;
-
-      for (var x=0; x<5; x++) {
-        this._perspectiveCoords[x] = [];
-
-        for (var y=0; y<5; y++) {
-          this._perspectiveCoords[x][y] = [(x-b)*m, (y-b)*m];
-          this._cells.push([x,y]);
-        }
-      }
+      this._b = (this.color === 'WHITE') ? 0 : 4;
+      this._m = (this.color === 'WHITE') ? 1 : -1;
 
       this.renderGridLines();
+      this.renderPieces();
     }
 
     Perspective.prototype = {
+      _gridXToSvgX: function(gridX) {
+        return (gridX-this._b) * this._m * 20 + 10;
+      },
+      _gridYToSvgY: function(gridY) {
+        return (gridY-this._b) * this._m * 20 + 10;
+      },
       renderGridLines: function() {
-        var gridLines = this.svg
+        var self = this;
+
+        var gridLines = self.svg
           .attr('viewBox', '-1 -1 102 102')
           .append('g')
           .classed('grid-lines', true);
@@ -61,6 +59,23 @@
           .attr('fill', 'none')
           .attr('stroke', 'black')
           .attr('stroke-width', 1);
+      },
+      renderPieces: function() {
+        var self = this;
+
+        var piecesContainer = self.svg
+          .append('g')
+          .classed('pieces', true);
+
+        piecesContainer.selectAll('image.piece')
+          .data(self.gameState.getPieces())
+          .enter()
+          .append('image')
+          .attr('width', 15)
+          .attr('height', 15)
+          .attr('x', function(d) { return self._gridXToSvgX(d.x) - 7.5; })
+          .attr('y', function(d) { return self._gridYToSvgY(d.y) - 7.5; })
+          .attr('href', function(d) { return d.piece.getSvgPath(); });
 
       }
     };
@@ -68,5 +83,8 @@
     return Perspective;
   }
 
-  define(['d3'], wrap);
+  define([
+    'd3',
+    'game'
+  ], wrap);
 })();
