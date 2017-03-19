@@ -17,9 +17,11 @@
   },
   "homepage": "https://github.com/RyanJenkins/Onitama#readme",
   "dependencies": {
+    "babel-preset-es2015": "^6.24.0",
     "del": "^2.2.2",
     "express": "^4.15.2",
     "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
     "requirejs": "^2.3.3"
   },
   "devDependencies": {

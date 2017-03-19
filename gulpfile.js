@@ -1,6 +1,7 @@
 var gulp = require('gulp');
 var del = require('del');
 var nodemon = require('gulp-nodemon');
+var babel = require('gulp-babel');
 
 var jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
   svgFiles = ['src/assets/svg/*.svg'],
@@ -12,6 +13,7 @@ gulp.task('clean', function() {
 
 gulp.task('js', function() {
   return gulp.src(jsFiles)
+    .pipe(babel({ presets: ['es2015'] }))
     .pipe(gulp.dest('build/static/js'));
 });
 

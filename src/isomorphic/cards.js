@@ -1,12 +1,6 @@
 ;(function() {
   function wrap() {
-    function constVal(value) {
-      var f = function() {
-        return value;
-      };
-
-      return f;
-    }
+    const constVal = (value) => () => value;
 
     var cards = [
       {

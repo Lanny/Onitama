@@ -130,8 +130,8 @@
           .append('image')
           .attr('width', 15)
           .attr('height', 15)
-          .attr('x', function(d) { return self._gridXToSvgX(d.x) - 7.5; })
-          .attr('y', function(d) { return self._gridYToSvgY(d.y) - 7.5; })
+          .attr('x', (d) => self._gridXToSvgX(d.x) - 7.2 )
+          .attr('y', (d) => self._gridYToSvgY(d.y) - 7.5 )
           .attr('href', function(d) { return d.piece.getSvgPath(); });
 
       },

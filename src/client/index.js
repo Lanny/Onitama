@@ -1,5 +1,5 @@
 ;(function() {
-  require([
+  requirejs([
     'game',
     'perspective'
   ], function(game, Perspective) {
