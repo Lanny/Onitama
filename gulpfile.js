@@ -5,7 +5,7 @@ var babel = require('gulp-babel');
 
 var jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
   svgFiles = ['src/assets/svg/*.svg'],
-  htmlFiles = ['src/assets/svg/*.svg'];
+  htmlFiles = ['src/assets/html/*.html'];
 
 gulp.task('clean', function() {
   return del('build');
