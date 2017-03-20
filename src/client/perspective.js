@@ -58,8 +58,8 @@
         .enter()
         .append('rect')
         .classed('position', true)
-        .attr('x', function(d) { return (2-d[0])*20 })
-        .attr('y', function(d) { return (2-d[1])*20 })
+        .attr('x', d => (2-d[0])*20 )
+        .attr('y', d => (2-d[1])*20 )
         .attr('width', 20)
         .attr('height', 20)
         .attr('fill', 'grey');
@@ -91,7 +91,7 @@
       this._b = (this.color === 'WHITE') ? 0 : 4;
       this._m = (this.color === 'WHITE') ? 1 : -1;
 
-      this.svg.attr('viewBox', '-1 -1 102 152')
+      this.svg.attr('viewBox', '-1 -1 102 152');
 
       this.svgBoard = this.svg.append('g')
         .attr('transform', 'translate(0, 25)');
