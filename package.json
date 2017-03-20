@@ -22,7 +22,8 @@
     "express": "^4.15.2",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
-    "requirejs": "^2.3.3"
+    "requirejs": "^2.3.3",
+    "yargs": "^7.0.2"
   },
   "devDependencies": {
     "gulp-nodemon": "^2.2.1"

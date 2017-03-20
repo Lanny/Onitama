@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var del = require('del');
 var nodemon = require('gulp-nodemon');
 var babel = require('gulp-babel');
+var argv = require('yargs').argv;
 
 var jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
   svgFiles = ['src/assets/svg/*.svg'],
@@ -12,9 +13,13 @@ gulp.task('clean', function() {
 });
 
 gulp.task('js', function() {
-  return gulp.src(jsFiles)
-    .pipe(babel({ presets: ['es2015'] }))
-    .pipe(gulp.dest('build/static/js'));
+  var pipeLine = gulp.src(jsFiles);
+
+  if (argv.production) {
+    pipeLine = pipeLine.pipe(babel({ presets: ['es2015'] }));
+  }
+
+  return pipeLine.pipe(gulp.dest('build/static/js'));
 });
 
 gulp.task('svg', function() {
