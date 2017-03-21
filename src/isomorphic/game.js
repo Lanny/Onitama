@@ -16,7 +16,7 @@
       for (var i=arr.length - 1; i>0; i--) {
         j = ~~(Math.random() * (i + 1));
         tmp = arr[i];
-        arr[i] = arr[j];
+        arr[i] = Object.create(arr[j]);
         arr[j] = tmp;
       }
 
@@ -63,15 +63,13 @@
 
     function GameState() {
       this.board = null;
-      this.transferSlot = null;
-      this.whiteHand = [];
-      this.blackHand = [];
+      this.deck = null;
 
       this.init();
     }
 
     GameState.prototype = {
-      init: function() {
+      init() {
         this.board = [
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
@@ -80,14 +78,21 @@
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
         ];
 
-        var deck = shuffle(cards.deck).splice(0, 5);
-        this.whiteHand.push(drawCard(deck));
-        this.whiteHand.push(drawCard(deck));
-        this.blackHand.push(drawCard(deck));
-        this.blackHand.push(drawCard(deck));
-        this.transferSlot = drawCard(deck);
+        this.deck = shuffle(cards.deck).splice(0, 5);
+        this.deck[0].hand = 'WHITE0';
+        this.deck[1].hand = 'WHITE1';
+        this.deck[2].hand = 'BLACK0';
+        this.deck[3].hand = 'BLACK1';
+        this.deck[4].hand = 'TRANSFER';
       },
-      getPieces: function() {
+      executeMove(initialPosition, targetPosition, card) {
+        this.deck
+          .filter(card => card.hand === 'TRANSFER')[0]
+          .hand = card.hand;
+
+        card.hand = 'TRANSFER';
+      },
+      getPieces() {
         var pieces = [];
 
         for (var x=0; x<5; x++) {
@@ -103,7 +108,8 @@
         }
 
         return pieces;
-      }
+      },
+
     };
 
     var Module = {

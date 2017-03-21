@@ -1,5 +1,24 @@
 ;(function() {
   function wrap(d3, game) {
+    var cardSlots = {
+      'BLACK0': [0, 0],
+      'BLACK1': [51, 0],
+      'WHITE0': [0, 130],
+      'WHITE1': [51, 130],
+      'TRANSFER': [105, 65]
+    };
+
+    function getCardCoords(position, perspective) {
+      if (position === 'TRANSFER') {
+        return cardSlots[position];
+      }
+
+      var b = (perspective === 'WHITE') ? 0 : 130,
+        m = (perspective === 'WHITE') ? 1 : -1;
+
+      return cardSlots[position].map(v => (v - b) * m);
+    }
+
     function drawGrid(g) {
       g.selectAll('line.vert-line')
         .data(d3.range(1,5))
@@ -37,10 +56,11 @@
       return g;
     }
 
-    function drawCard(g, card, flipped) {
+    function drawCard(g, card) {
       var border = 12.5;
 
-      g.attr('transform', 'scale(0.16)')
+      g.classed('card', true)
+        .attr('transform', 'scale(0.16)')
         .append('rect')
         .attr('width', 250)
         .attr('height', 125)
@@ -71,7 +91,6 @@
         .attr('height', 20)
         .attr('fill', 'black');
 
-
       g.selectAll('text.card-caption')
         .data([card])
         .enter()
@@ -98,9 +117,7 @@
 
       this.renderGridLines(this.svgBoard);
       this.renderPieces(this.svgBoard);
-
-      var fff = this.svg.append('g');
-      drawCard(fff, this.gameState.whiteHand[0], false);
+      this.renderCards(this.svgBoard);
     }
 
     Perspective.prototype = {
@@ -135,8 +152,20 @@
           .attr('href', function(d) { return d.piece.getSvgPath(); });
 
       },
-      renderCard: function(g) {
+      renderCards(svg) {
+        var self = this;
+        var cards = svg.selectAll('g.cards')
+          .data(this.gameState.deck);
 
+        cards.enter()
+          .append('g')
+          .each((card, i, nodes) => drawCard(d3.select(nodes[i]), card));
+
+        cards = svg.selectAll('g.card');
+
+        cards.attr('transform', function(d) {
+          return `translate(${ getCardCoords(d.hand, self.color).join(',') })`;
+        });
       }
     };
 
