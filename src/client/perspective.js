@@ -1,10 +1,10 @@
 ;(function() {
-  function wrap(d3, game) {
+  function wrap(d3, game, utils) {
     var cardSlots = {
-      'BLACK0': [0, 0],
-      'BLACK1': [51, 0],
-      'WHITE0': [0, 130],
-      'WHITE1': [51, 130],
+      'BLACK0': [5, 0],
+      'BLACK1': [55, 0],
+      'WHITE0': [5, 130],
+      'WHITE1': [55, 130],
       'TRANSFER': [105, 65]
     };
 
@@ -110,14 +110,14 @@
       this._b = (this.color === 'WHITE') ? 0 : 4;
       this._m = (this.color === 'WHITE') ? 1 : -1;
 
-      this.svg.attr('viewBox', '-1 -1 102 152');
+      this.svg.attr('viewBox', '-1 -1 152 152');
 
       this.svgBoard = this.svg.append('g')
         .attr('transform', 'translate(0, 25)');
 
       this.renderGridLines(this.svgBoard);
       this.renderPieces(this.svgBoard);
-      this.renderCards(this.svgBoard);
+      this.renderCards(this.svg);
     }
 
     Perspective.prototype = {
@@ -163,9 +163,10 @@
 
         cards = svg.selectAll('g.card');
 
-        cards.attr('transform', function(d) {
-          return `translate(${ getCardCoords(d.hand, self.color).join(',') })`;
-        });
+        cards.attr('transform', d => (new utils.Matrix())
+                   .scale(0.16)
+                   .translate(...getCardCoords(d.hand, self.color))
+                   .fmt());
       }
     };
 
@@ -174,6 +175,7 @@
 
   define([
     'd3',
-    'game'
+    'game',
+    'utils'
   ], wrap);
 })();
