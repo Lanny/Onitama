@@ -1,7 +1,7 @@
 ;(function() {
   function wrap(cards) {
-    var WHITE = 0,
-      BLACK = 1;
+    var WHITE = 'WHITE',
+      BLACK = 'BLACK';
 
     function drawCard(deck) {
       var idx = ~~(Math.random() * deck.length);
@@ -84,6 +84,8 @@
         this.deck[2].hand = 'BLACK0';
         this.deck[3].hand = 'BLACK1';
         this.deck[4].hand = 'TRANSFER';
+
+        this.currentTurn = WHITE;
       },
       executeMove(initialPosition, targetPosition, card) {
         this.deck
@@ -109,7 +111,9 @@
 
         return pieces;
       },
-
+      getCellContents(x, y) {
+        return this.board[x][y];
+      }
     };
 
     var Module = {

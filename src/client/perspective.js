@@ -16,7 +16,35 @@
       var b = (perspective === 'WHITE') ? 0 : 130,
         m = (perspective === 'WHITE') ? 1 : -1;
 
-      return cardSlots[position].map(v => (v - b) * m);
+      return [
+        (cardSlots[position][0] - b) * m,
+        cardSlots[position][1]
+      ];
+    }
+
+    function extractTagType(selector) {
+      var els = selector.split(/[> ]/g),
+        tag = els[els.length-1],
+        tagName = tag.split(/[#\.]/)[0];
+
+      return tagName;
+    }
+
+    function rectify(parent, selector, data, applyProps) {
+      var elements = parent
+        .selectAll(selector)
+        .data(data);
+
+      elements
+        .exit()
+        .remove();
+
+      var enterSelection = elements
+        .enter()
+        .append(extractTagType(selector));
+
+      applyProps(enterSelection);
+      applyProps(elements);
     }
 
     function drawGrid(g, fill='none') {
@@ -109,8 +137,8 @@
 
       this._activeCell = null;
 
-      this._b = (this.color === 'WHITE') ? 0 : 4;
-      this._m = (this.color === 'WHITE') ? 1 : -1;
+      this._b = (this.color === 'WHITE') ? 4 : 0;
+      this._m = (this.color === 'WHITE') ? -1 : 1;
 
       this.svg.attr('viewBox', '-1 -1 152 152');
 
@@ -134,31 +162,41 @@
         return [
           (~~(sx / 20)) / this._m + this._b,
           (~~(sy / 20)) / this._m + this._b,
-        ]
+        ];
       },
       onBoardClick() {
         var [x, y] = this._svgXYToGridXY(d3.mouse(this.svgBoard.node()));
-        this._activeCell = {x, y};
+
+        var contents = this.gameState.getCellContents(x, y);
+
+        if (contents !== null &&
+            contents.getColor() === this.gameState.currentTurn &&
+            contents.getColor() === this.color) {
+
+          if (this._activeCell &&
+              this._activeCell.x === x &&
+              this._activeCell.y === y) {
+            this._activeCell = null;
+          } else {
+            this._activeCell = {x, y};
+          }
+        }
+
         this.updateCellHighlights();
       },
       updateCellHighlights() {
-        this.svgBoard
-          .selectAll('rect.highlighted-cell')
-          .data([this._activeCell])
-          .enter()
-          .append('rect')
-          .classed('highlighted-cell', true);
+        var data = this._activeCell ? [this._activeCell] : [];
 
-        this.svgBoard
-          .selectAll('rect.highlighted-cell')
-          .attr('x', d => this._gridXToSvgX(d.x) - 10 )
-          .attr('y', d => this._gridYToSvgY(d.y) - 10 )
-          .attr('width', 20)
-          .attr('height', 20)
-          .attr('fill', 'none')
-          .attr('stroke', 'yellow')
-          .attr('stroke-width', 1);
-
+        rectify( this.svgBoard, 'rect.highlighted-cell', data,
+          selection => selection
+            .classed('highlighted-cell', true)
+            .attr('x', d => this._gridXToSvgX(d.x) - 10 )
+            .attr('y', d => this._gridYToSvgY(d.y) - 10 )
+            .attr('width', 20)
+            .attr('height', 20)
+            .attr('fill', 'none')
+            .attr('stroke', 'yellow')
+            .attr('stroke-width', 1));
       },
       renderGridLines(board) {
         var gridLines = board
@@ -191,7 +229,7 @@
       },
       renderCards(svg) {
         var self = this;
-        var cards = svg.selectAll('g.cards')
+        var cards = svg.selectAll('g.card')
           .data(this.gameState.deck);
 
         cards.enter()
