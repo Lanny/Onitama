@@ -107,6 +107,8 @@
       this.color = color;
       this.svg = d3.select(svg);
 
+      this._activeCell = null;
+
       this._b = (this.color === 'WHITE') ? 0 : 4;
       this._m = (this.color === 'WHITE') ? 1 : -1;
 
@@ -121,36 +123,64 @@
     }
 
     Perspective.prototype = {
-      _gridXToSvgX: function(gridX) {
+      _gridXToSvgX(gridX) {
         return (gridX-this._b) * this._m * 20 + 10;
       },
-      _gridYToSvgY: function(gridY) {
+      _gridYToSvgY(gridY) {
         return (gridY-this._b) * this._m * 20 + 10;
       },
-      renderGridLines: function(board) {
+      onPieceClick(pieceData) {
+        this._activeCell = {x: pieceData.x, y: pieceData.y};
+        this.updateCellHighlights();
+      },
+      updateCellHighlights() {
+        this.svgBoard
+          .selectAll('rect.highlighted-cell')
+          .data([this._activeCell])
+          .enter()
+          .append('rect')
+          .classed('highlighted-cell', true);
+
+        this.svgBoard
+          .selectAll('rect.highlighted-cell')
+          .attr('x', d => this._gridXToSvgX(d.x) - 10 )
+          .attr('y', d => this._gridYToSvgY(d.y) - 10 )
+          .attr('width', 20)
+          .attr('height', 20)
+          .attr('fill', 'none')
+          .attr('stroke', 'yellow')
+          .attr('stroke-width', 1);
+
+      },
+      renderGridLines(board) {
         var gridLines = board
           .append('g')
           .classed('grid-lines', true);
 
         drawGrid(gridLines);
       },
-      renderPieces: function(board) {
-        var self = this;
-
+      renderPieces(board) {
         var piecesContainer = board
           .append('g')
           .classed('pieces', true);
 
         piecesContainer.selectAll('image.piece')
-          .data(self.gameState.getPieces())
+          .data(this.gameState.getPieces())
           .enter()
           .append('image')
+          .classed('piece', true)
           .attr('width', 15)
           .attr('height', 15)
-          .attr('x', (d) => self._gridXToSvgX(d.x) - 7.2 )
-          .attr('y', (d) => self._gridYToSvgY(d.y) - 7.5 )
-          .attr('href', function(d) { return d.piece.getSvgPath(); });
+          .attr('href', d => d.piece.getSvgPath() );
 
+        piecesContainer.selectAll('image.piece')
+          .exit()
+          .remove();
+
+        piecesContainer.selectAll('image.piece')
+          .attr('x', d => this._gridXToSvgX(d.x) - 7.2 )
+          .attr('y', d => this._gridYToSvgY(d.y) - 7.5 )
+          .on('click', this.onPieceClick.bind(this));
       },
       renderCards(svg) {
         var self = this;
