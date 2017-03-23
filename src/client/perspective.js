@@ -19,7 +19,16 @@
       return cardSlots[position].map(v => (v - b) * m);
     }
 
-    function drawGrid(g) {
+    function drawGrid(g, fill='none') {
+      g.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', 100)
+        .attr('height', 100)
+        .attr('fill', fill)
+        .attr('stroke', 'black')
+        .attr('stroke-width', 1);
+
       g.selectAll('line.vert-line')
         .data(d3.range(1,5))
         .enter()
@@ -41,15 +50,6 @@
         .attr('y2', function(d) { return d*20; })
         .attr('x1', function(d) { return 0; })
         .attr('x2', function(d) { return 100; })
-        .attr('stroke', 'black')
-        .attr('stroke-width', 1);
-
-      g.append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', 100)
-        .attr('height', 100)
-        .attr('fill', 'none')
         .attr('stroke', 'black')
         .attr('stroke-width', 1);
 
@@ -115,7 +115,8 @@
       this.svg.attr('viewBox', '-1 -1 152 152');
 
       this.svgBoard = this.svg.append('g')
-        .attr('transform', 'translate(0, 25)');
+        .attr('transform', 'translate(0, 25)')
+        .on('click', this.onBoardClick.bind(this));
 
       this.renderGridLines(this.svgBoard);
       this.renderPieces(this.svgBoard);
@@ -129,8 +130,15 @@
       _gridYToSvgY(gridY) {
         return (gridY-this._b) * this._m * 20 + 10;
       },
-      onPieceClick(pieceData) {
-        this._activeCell = {x: pieceData.x, y: pieceData.y};
+      _svgXYToGridXY([sx,sy]) {
+        return [
+          (~~(sx / 20)) / this._m + this._b,
+          (~~(sy / 20)) / this._m + this._b,
+        ]
+      },
+      onBoardClick() {
+        var [x, y] = this._svgXYToGridXY(d3.mouse(this.svgBoard.node()));
+        this._activeCell = {x, y};
         this.updateCellHighlights();
       },
       updateCellHighlights() {
@@ -157,7 +165,7 @@
           .append('g')
           .classed('grid-lines', true);
 
-        drawGrid(gridLines);
+        drawGrid(gridLines, 'white');
       },
       renderPieces(board) {
         var piecesContainer = board
@@ -179,8 +187,7 @@
 
         piecesContainer.selectAll('image.piece')
           .attr('x', d => this._gridXToSvgX(d.x) - 7.2 )
-          .attr('y', d => this._gridYToSvgY(d.y) - 7.5 )
-          .on('click', this.onPieceClick.bind(this));
+          .attr('y', d => this._gridYToSvgY(d.y) - 7.5 );
       },
       renderCards(svg) {
         var self = this;
