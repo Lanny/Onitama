@@ -50,7 +50,7 @@
     }
     Student.prototype = new Piece();
     Student.prototype.getSvgPath = function() {
-      return 'svg/' + ((this._color === WHITE) ? 'white' : 'black') + '-pawn.svg';
+      return '/static/svg/' + ((this._color === WHITE) ? 'white' : 'black') + '-pawn.svg';
     };
 
     function Master(color) {
@@ -58,7 +58,7 @@
     }
     Master.prototype = new Piece();
     Master.prototype.getSvgPath = function() {
-      return 'svg/' + ((this._color === WHITE) ? 'white' : 'black') + '-king.svg';
+      return '/static/svg/' + ((this._color === WHITE) ? 'white' : 'black') + '-king.svg';
     };
 
     function GameState() {

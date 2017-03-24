@@ -5,8 +5,7 @@ var babel = require('gulp-babel');
 var argv = require('yargs').argv;
 
 var jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
-  svgFiles = ['src/assets/svg/*.svg'],
-  htmlFiles = ['src/assets/html/*.html'];
+  svgFiles = ['src/assets/svg/*.svg'];
 
 gulp.task('clean', function() {
   return del('build');
@@ -27,20 +26,15 @@ gulp.task('svg', function() {
     .pipe(gulp.dest('build/static/svg'));
 });
 
-gulp.task('html', function() {
-  return gulp.src(htmlFiles)
-    .pipe(gulp.dest('build/static'));
-});
-
-gulp.task('generate', ['js', 'svg', 'html'], function() { });
+gulp.task('generate', ['js', 'svg'], function() { });
 
 gulp.task('server', ['generate'], function() {
   gulp.watch(jsFiles, ['js']);
   gulp.watch(svgFiles, ['svg']);
-  gulp.watch(htmlFiles, ['html']);
 
   return nodemon({
     script: 'src/server/index.js',
-    watch: 'src/server/'
+    ext: 'js,pug',
+    watch: ['src/server/', 'src/assets/pug/']
   });
 });
