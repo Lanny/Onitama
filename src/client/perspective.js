@@ -185,14 +185,9 @@
         this.updateCellHighlights();
       },
       updateCellHighlights() {
-        if (this._activeCell) {
-          console.log(this.gameState.gatherMoves([
-            this._activeCell.x, this._activeCell.y
-          ]));
-        }
         var data = this._activeCell ? [this._activeCell] : [];
 
-        rectify( this.svgBoard, 'rect.highlighted-cell', data,
+        rectify(this.svgBoard, 'rect.highlighted-cell', data,
           selection => selection
             .classed('highlighted-cell', true)
             .attr('x', d => this._gridXToSvgX(d.x) - 10 )
@@ -202,6 +197,22 @@
             .attr('fill', 'none')
             .attr('stroke', 'yellow')
             .attr('stroke-width', 1));
+
+        var moves = this._activeCell ?
+          this.gameState.gatherMoves([this._activeCell.x, this._activeCell.y]) :
+          [];
+
+        rectify(this.svgBoard, 'rect.possible-move', moves,
+          selection => selection
+            .classed('possible-move', true)
+            .attr('x', d => this._gridXToSvgX(d.cell[0]) - 10 )
+            .attr('y', d => this._gridYToSvgY(d.cell[1]) - 10 )
+            .attr('width', 20)
+            .attr('height', 20)
+            .attr('fill', 'none')
+            .attr('stroke', 'green')
+            .attr('stroke-width', 1));
+
       },
       renderGridLines(board) {
         var gridLines = board
