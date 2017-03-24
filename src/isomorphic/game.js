@@ -112,6 +112,12 @@
           throw new Error('Invalid move!');
         }
 
+        const [ix, iy] = initialPosition,
+          [tx, ty] = targetPosition;
+
+        this.board[tx][ty] = this.board[ix][iy];
+        this.board[ix][iy] = null;
+
         this.deck
           .filter(card => card.hand === 'TRANSFER')[0]
           .hand = card.hand;
