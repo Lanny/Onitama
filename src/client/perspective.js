@@ -84,7 +84,7 @@
       return g;
     }
 
-    function drawCard(g, card) {
+    function rectifyCard(g, card) {
       var border = 12.5;
 
       g.classed('card', true)
@@ -96,38 +96,39 @@
         .attr('stroke', 'black')
         .attr('stroke-width', 1);
 
-      var moveGrid = g.append('g')
-        .attr('transform', 'translate('+border+','+border+')');
+      rectify(g, 'g.move-grid', [card],
+        selection => selection
+          .classed('move-grid', true)
+          .attr('transform', `translate(${border},${border})`)
+          .call(drawGrid));
 
-      drawGrid(moveGrid);
+      var moveGrid = g.select('g.move-grid');
 
-      moveGrid.selectAll('rect.position')
-        .data(card.getMoves(null))
-        .enter()
-        .append('rect')
-        .classed('position', true)
-        .attr('x', d => (2-d[0])*20 )
-        .attr('y', d => (2-d[1])*20 )
-        .attr('width', 20)
-        .attr('height', 20)
-        .attr('fill', 'grey');
+      rectify(moveGrid, 'rect.position', card.getMoves(),
+        selection => selection
+          .classed('position', true)
+          .attr('x', d => (2-d[0])*20 )
+          .attr('y', d => (2-d[1])*20 )
+          .attr('width', 20)
+          .attr('height', 20)
+          .attr('fill', 'grey'));
 
-      moveGrid.append('rect')
-        .attr('x', 40)
-        .attr('y', 40)
-        .attr('width', 20)
-        .attr('height', 20)
-        .attr('fill', 'black');
+      rectify(moveGrid, 'rect.border', [card],
+        selection => selection
+          .classed('border', true)
+          .attr('x', 40)
+          .attr('y', 40)
+          .attr('width', 20)
+          .attr('height', 20)
+          .attr('fill', 'black'));
 
-      g.selectAll('text.card-caption')
-        .data([card])
-        .enter()
-        .append('text')
-        .classed('card-caption', true)
-        .text(function(d) { return d.name; })
-        .attr('text-anchor', 'middle')
-        .attr('x', 175)
-        .attr('y', 65);
+      rectify(g, 'text.card-caption', [card],
+        selection => selection
+          .classed('card-caption', true)
+          .text(function(d) { return d.name; })
+          .attr('text-anchor', 'middle')
+          .attr('x', 175)
+          .attr('y', 65));
     }
 
     function Perspective(gameState, color, svg) {
@@ -223,6 +224,7 @@
 
         const next = (info) => {
           this.renderPieces(this.svgBoard);
+          this.renderCards(this.svg);
 
           if (cont === true) {
             this.gameState.nextStateChange().then(next);
@@ -285,19 +287,14 @@
       },
       renderCards(svg) {
         var self = this;
-        var cards = svg.selectAll('g.card')
-          .data(this.gameState.deck);
 
-        cards.enter()
-          .append('g')
-          .each((card, i, nodes) => drawCard(d3.select(nodes[i]), card));
-
-        cards = svg.selectAll('g.card');
-
-        cards.attr('transform', d => (new utils.Matrix())
-                   .scale(0.16)
-                   .translate(...getCardCoords(d.hand, self.color))
-                   .fmt());
+        rectify(svg, 'g.card', this.gameState.deck,
+          selection => selection
+          .each((card, i, nodes) => rectifyCard(d3.select(nodes[i]), card))
+          .attr('transform', d => (new utils.Matrix())
+            .scale(0.16)
+            .translate(...getCardCoords(d.hand, self.color))
+            .fmt()));
       }
     };
 
