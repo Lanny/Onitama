@@ -147,6 +147,11 @@
         .on('click', this.onBoardClick.bind(this));
 
       this.renderGridLines(this.svgBoard);
+
+      this.svgBoard
+        .append('g')
+        .classed('pieces', true);
+
       this.renderPieces(this.svgBoard);
       this.renderCards(this.svg);
 
@@ -217,16 +222,16 @@
           stateChangeInfo;
 
         const next = (info) => {
-          console.log('move has been made');
+          this.renderPieces(this.svgBoard);
 
           if (cont === true) {
-            this.gameState.nextStateChange(next);
+            this.gameState.nextStateChange().then(next);
           } else {
             alert('Game has terminated');
           }
         };
 
-        this.gameState.nextStateChange(next);
+        this.gameState.nextStateChange().then(next);
       }),
       updateCellHighlights() {
         var data = this._activeCell ? [this._activeCell] : [];
@@ -266,26 +271,17 @@
         drawGrid(gridLines, 'white');
       },
       renderPieces(board) {
-        var piecesContainer = board
-          .append('g')
-          .classed('pieces', true);
+        const piecesContainer = board.selectAll('g.pieces'),
+          data = this.gameState.getPieces();
 
-        piecesContainer.selectAll('image.piece')
-          .data(this.gameState.getPieces())
-          .enter()
-          .append('image')
-          .classed('piece', true)
-          .attr('width', 15)
-          .attr('height', 15)
-          .attr('href', d => d.piece.getSvgPath() );
-
-        piecesContainer.selectAll('image.piece')
-          .exit()
-          .remove();
-
-        piecesContainer.selectAll('image.piece')
-          .attr('x', d => this._gridXToSvgX(d.x) - 7.2 )
-          .attr('y', d => this._gridYToSvgY(d.y) - 7.5 );
+        rectify(piecesContainer, 'image.piece', data,
+          selection => selection
+            .classed('piece', true)
+            .attr('width', 15)
+            .attr('height', 15)
+            .attr('href', d => d.piece.getSvgPath() )
+            .attr('x', d => this._gridXToSvgX(d.x) - 7.2 )
+            .attr('y', d => this._gridYToSvgY(d.y) - 7.5 ));
       },
       renderCards(svg) {
         var self = this;

@@ -53,7 +53,16 @@
       return equalsNeighbor.reduce((acc, b) => acc && b, true);
     }
 
-    return { Matrix, arrayEquals };
+    function clone(obj) {
+      var newObj = {};
+      for (let key in obj) {
+        newObj[key] = obj[key];
+      }
+
+      return newObj;
+    }
+
+    return { Matrix, arrayEquals, clone };
   }
 
   define([], wrap);

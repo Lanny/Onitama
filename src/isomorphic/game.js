@@ -10,7 +10,7 @@
 
     function shuffle(arr) {
       // clone and FY shuffle an array
-      arr = arr.map(e => Object.create(e));
+      arr = arr.map(utils.clone);
 
       var j, tmp;
       for (var i=arr.length - 1; i>0; i--) {
