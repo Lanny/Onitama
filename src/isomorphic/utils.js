@@ -30,7 +30,30 @@
       }
     };
 
-    return { Matrix };
+    function _arrayEquals(left, right) {
+      if (!Array.isArray(left) ||
+          !Array.isArray(right) ||
+          left.length !== right.length) {
+        return false;
+      }
+
+      for (let i=0; i<left.length; i++) {
+        if (left[i] !== right[i]) return false;
+      }
+
+      return true;
+    }
+
+    function arrayEquals(...arrays) {
+      var equalsNeighbor = [];
+      for (let i=0; i<(arrays.length-1); i++) {
+        equalsNeighbor.push(_arrayEquals(arrays[i], arrays[i+1]));
+      }
+
+      return equalsNeighbor.reduce((acc, b) => acc && b, true);
+    }
+
+    return { Matrix, arrayEquals };
   }
 
   define([], wrap);

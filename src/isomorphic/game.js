@@ -87,7 +87,31 @@
 
         this.currentTurn = WHITE;
       },
+      validateMove(initialPosition, targetPosition, card) {
+        const piece = this.getCellContents(...initialPosition);
+
+        if (piece === null || piece.getColor() !== this.currentTurn) {
+          return false;
+        }
+
+        const move = gatherMoves(initialPosition)
+          .filter(move => utils.arrayEquals(move.cell, targetPosition))[0];
+
+        if (move === undefined) {
+          return false;
+        }
+
+        const cardWorks = !!(move.cards
+          .filter(moveCard => moveCard === card)
+          .length);
+
+        return cardWorks;
+      },
       executeMove(initialPosition, targetPosition, card) {
+        if (!this.validateMove(initialPosition, targetPosition, card)) {
+          throw new Error('Invalid move!');
+        }
+
         this.deck
           .filter(card => card.hand === 'TRANSFER')[0]
           .hand = card.hand;
@@ -127,7 +151,7 @@
             .filter(([x,y]) => {
               var contents = this.getCellContents(x,y);
               return contents === null || contents.getColor() !== color;
-            })
+            });
 
         return validMoves;
       },
@@ -140,9 +164,9 @@
           moves = {},
           combinedMoveList = [];
 
-        for (var i=0; i<cards.length; i++) {
-          for (var k=0; k<moveLists[i].length; k++) {
-            var key = `${moveLists[i][k][0]},${moveLists[i][k][1]}`;
+        for (let i=0; i<cards.length; i++) {
+          for (let k=0; k<moveLists[i].length; k++) {
+            let key = `${moveLists[i][k][0]},${moveLists[i][k][1]}`;
 
             if (key in moves) {
               moves[key].cards.push(cards[i]);
@@ -150,12 +174,12 @@
               moves[key] = {
                 cards: [cards[i]],
                 cell: moveLists[i][k]
-              }
+              };
             }
           }
         }
 
-        for (var key in moves) {
+        for (let key in moves) {
           combinedMoveList.push(moves[key]);
         }
 
