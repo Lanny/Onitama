@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap(cards) {
+  function wrap(cards, utils) {
     var WHITE = 'WHITE',
       BLACK = 'BLACK';
 
@@ -94,7 +94,7 @@
           return false;
         }
 
-        const move = gatherMoves(initialPosition)
+        const move = this.gatherMoves(initialPosition)
           .filter(move => utils.arrayEquals(move.cell, targetPosition))[0];
 
         if (move === undefined) {
@@ -156,8 +156,13 @@
         return validMoves;
       },
       gatherMoves(cell) {
-        var piece = this.getCellContents(...cell),
-          color = piece.getColor(),
+        const piece = this.getCellContents(...cell);
+
+        if (piece === null) {
+          return [];
+        }
+
+        const color = piece.getColor(),
           cards = this.getAvailableCards(color),
           moveLists = cards
             .map(card => this._gatherMovesForCard(color, card, cell)),
@@ -197,6 +202,7 @@
   }
 
   define([
-    'cards'
+    'cards',
+    'utils'
   ], wrap);
 })();

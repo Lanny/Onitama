@@ -164,9 +164,31 @@
           (~~(sy / 20)) / this._m + this._b,
         ];
       },
+      executeMove(initialPosition, targetPosition, card) {
+        // TODO: broadcast this move to the server
+
+        this.gameState.executeMove(initialPosition, targetPosition, card);
+      },
       onBoardClick() {
         var [x, y] = this._svgXYToGridXY(d3.mouse(this.svgBoard.node()));
 
+        // If we have an active cell and the user clicked on another cell,
+        // attempt to make that move.
+        if (this._activeCell && !utils.arrayEquals(this._activeCell, [x,y])) {
+          const {x: acx, y: acy} = this._activeCell,
+            move = this.gameState.gatherMoves([acx, acy])
+              .filter(move => utils.arrayEquals(move.cell, [x,y]))[0];
+
+          if (move !== undefined) {
+            if (move.cards.length !== 1) {
+              alert('DON\'T KNOW WHAT TO DO YET LOL!');
+            } else {
+              this.executeMove([acx, acy], [x, y], move.cards[0]);
+            }
+          }
+        }
+
+        // Otherwise try to update the active cell.
         var contents = this.gameState.getCellContents(x, y);
 
         if (contents !== null &&
