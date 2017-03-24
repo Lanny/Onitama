@@ -9,7 +9,7 @@
       },
       {
         name: 'Monkey',
-        getMoves: constVal([[1, 1], [1, -1], [-1, 1], [1, -1]])
+        getMoves: constVal([[1, 1], [-1, -1], [-1, 1], [1, -1]])
       },
       {
         name: 'Horse',
