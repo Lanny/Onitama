@@ -86,6 +86,14 @@
         this.deck[4].hand = 'TRANSFER';
 
         this.currentTurn = WHITE;
+        this._nextStateResolve = null;
+        this._nextStatePromise = new Promise(
+          (resolve,_) => this._nextStateResolve = resolve);
+      },
+      _executeStateChange(info) {
+        this._nextStateResolve(info);
+        this._nextStatePromise = new Promise(
+          (resolve,_) => this._nextStateResolve = resolve);
       },
       validateMove(initialPosition, targetPosition, card) {
         const piece = this.getCellContents(...initialPosition);
@@ -123,6 +131,13 @@
           .hand = card.hand;
 
         card.hand = 'TRANSFER';
+
+        this._executeStateChange({
+          player: this.currentTurn,
+          initialPosition: initialPosition,
+          targetPosition: targetPosition,
+          card
+        });
       },
       getPieces() {
         var pieces = [];
@@ -196,6 +211,9 @@
 
         return combinedMoveList;
       },
+      nextStateChange: function() {
+        return this._nextStatePromise;
+      }
     };
 
     var Module = {

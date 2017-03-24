@@ -149,6 +149,8 @@
       this.renderGridLines(this.svgBoard);
       this.renderPieces(this.svgBoard);
       this.renderCards(this.svg);
+
+      this.watchStateChange();
     }
 
     Perspective.prototype = {
@@ -185,6 +187,10 @@
             } else {
               this.executeMove([acx, acy], [x, y], move.cards[0]);
             }
+
+            this._activeCell = null;
+            this.updateCellHighlights();
+            return;
           }
         }
 
@@ -206,6 +212,22 @@
 
         this.updateCellHighlights();
       },
+      watchStateChange: (function() {
+        var cont = true,
+          stateChangeInfo;
+
+        const next = (info) => {
+          console.log('move has been made');
+
+          if (cont === true) {
+            this.gameState.nextStateChange(next);
+          } else {
+            alert('Game has terminated');
+          }
+        };
+
+        this.gameState.nextStateChange(next);
+      }),
       updateCellHighlights() {
         var data = this._activeCell ? [this._activeCell] : [];
 
