@@ -84,7 +84,6 @@
         this.deck[2].hand = 'BLACK0';
         this.deck[3].hand = 'BLACK1';
         this.deck[4].hand = 'TRANSFER';
-        console.log(this.deck);
 
         this.currentTurn = WHITE;
       },
@@ -117,7 +116,51 @@
       },
       getAvailableCards(player) {
         return this.deck.filter(c => c.hand.substring(0,5) === player);
-      }
+      },
+      _gatherMovesForCard(color, card, [cx, cy]) {
+        var b = (color === BLACK) ? 4: 0,
+          m = (color === BLACK) ? -1 : 1,
+          validMoves = card.getMoves()
+            .map(([x,y]) => [(x-b) * m, (y-b) * m])
+            .map(([x,y]) => [x+cx, y+cy])
+            .filter(([x,y]) => x > -1 && x < 5 && y > -1 && y < 5)
+            .filter(([x,y]) => {
+              var contents = this.getCellContents(x,y);
+              return contents === null || contents.getColor() !== color;
+            })
+
+        return validMoves;
+      },
+      gatherMoves(cell) {
+        var piece = this.getCellContents(...cell),
+          color = piece.getColor(),
+          cards = this.getAvailableCards(color),
+          moveLists = cards
+            .map(card => this._gatherMovesForCard(color, card, cell)),
+          moves = {},
+          combinedMoveList = [];
+
+        for (var i=0; i<cards.length; i++) {
+          for (var k=0; k<moveLists[i].length; k++) {
+            var key = `${moveLists[i][k][0]},${moveLists[i][k][1]}`;
+
+            if (key in moves) {
+              moves[key].cards.push(cards[i]);
+            } else {
+              moves[key] = {
+                cards: [cards[i]],
+                cell: moveLists[i][k]
+              }
+            }
+          }
+        }
+
+        for (var key in moves) {
+          combinedMoveList.push(moves[key]);
+        }
+
+        return combinedMoveList;
+      },
     };
 
     var Module = {

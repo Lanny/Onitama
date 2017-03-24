@@ -139,8 +139,6 @@
 
       this._b = (this.color === 'WHITE') ? 4 : 0;
       this._m = (this.color === 'WHITE') ? -1 : 1;
-      this._rb = (this.color === 'BLACK') ? 4 : 0;
-      this._rm = (this.color === 'BLACK') ? -1 : 1;
 
       this.svg.attr('viewBox', '-1 -1 152 152');
 
@@ -166,50 +164,6 @@
           (~~(sy / 20)) / this._m + this._b,
         ];
       },
-      _gatherMovesForCard(card) {
-        var {x: acx, y: acy} = this._activeCell,
-          validMoves = card.getMoves()
-            .map(([x,y]) => [(x-this._rb) * this._rm, (y-this._rb) * this._rm])
-            .map(([x,y]) => [x+acx, y+acy])
-            .filter(([x,y]) => x > -1 && x < 5 && y > -1 && y < 5)
-            .filter(([x,y]) => {
-              var contents = this.gameState.getCellContents(x,y);
-              return contents === null || contents.getColor() !== this.color;
-            })
-
-        return validMoves;
-      },
-      gatherMoves() {
-        if (!this._activeCell) {
-          return [];
-        }
-
-        var cards = this.gameState.getAvailableCards(this.color),
-          moveLists = cards.map(card => this._gatherMovesForCard(card)),
-          moves = {},
-          combinedMoveList = [];
-
-        for (var i=0; i<cards.length; i++) {
-          for (var k=0; k<moveLists[i].length; k++) {
-            var key = `${moveLists[i][k][0]},${moveLists[i][k][1]}`;
-
-            if (key in moves) {
-              moves[key].cards.push(cards[i]);
-            } else {
-              moves[key] = {
-                cards: [cards[i]],
-                cell: moveLists[i][k]
-              }
-            }
-          }
-        }
-
-        for (var key in moves) {
-          combinedMoveList.push(moves[key]);
-        }
-
-        return combinedMoveList;
-      },
       onBoardClick() {
         var [x, y] = this._svgXYToGridXY(d3.mouse(this.svgBoard.node()));
 
@@ -231,6 +185,11 @@
         this.updateCellHighlights();
       },
       updateCellHighlights() {
+        if (this._activeCell) {
+          console.log(this.gameState.gatherMoves([
+            this._activeCell.x, this._activeCell.y
+          ]));
+        }
         var data = this._activeCell ? [this._activeCell] : [];
 
         rectify( this.svgBoard, 'rect.highlighted-cell', data,
