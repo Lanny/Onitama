@@ -10,13 +10,13 @@
 
     function shuffle(arr) {
       // clone and FY shuffle an array
-      arr = arr.slice();
+      arr = arr.map(e => Object.create(e));
 
       var j, tmp;
       for (var i=arr.length - 1; i>0; i--) {
         j = ~~(Math.random() * (i + 1));
         tmp = arr[i];
-        arr[i] = Object.create(arr[j]);
+        arr[i] = arr[j];
         arr[j] = tmp;
       }
 
@@ -84,6 +84,7 @@
         this.deck[2].hand = 'BLACK0';
         this.deck[3].hand = 'BLACK1';
         this.deck[4].hand = 'TRANSFER';
+        console.log(this.deck);
 
         this.currentTurn = WHITE;
       },
@@ -113,6 +114,9 @@
       },
       getCellContents(x, y) {
         return this.board[x][y];
+      },
+      getAvailableCards(player) {
+        return this.deck.filter(c => c.hand.substring(0,5) === player);
       }
     };
 

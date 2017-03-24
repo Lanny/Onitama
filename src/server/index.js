@@ -7,8 +7,6 @@ requirejs.config({
 function wrap(path, express) {
   var app = express();
 
-  console.log(path.join(__dirname, '../../build/static'));
-
   app.use('/static', express.static(path.join(__dirname, '../../build/static')));
 
   app.listen(3000, function () {
