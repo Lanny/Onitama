@@ -4,9 +4,21 @@ requirejs.config({
   nodeRequire: require
 });
 
-function wrap(path, express, pug, GameSession) {
+function wrap(express, http, socketIo, path, pug, GameSession) {
   const app = express(),
-    gameTemplate = pug.compileFile(path.join(__dirname, '../assets/pug/game.pug'));
+    server = http.Server(app),
+    io = socketIo(server),
+    templateCache = {};
+
+  function getTemplate(name) {
+    var templatePath = path.join(__dirname, '../assets/pug', name);
+
+    if (!(templatePath in templateCache)) {
+      templateCache[templatePath] = pug.compileFile(templatePath);
+    }
+
+    return templateCache[templatePath];
+  }
 
   app.locals.gameSessions = {};
 
@@ -33,18 +45,24 @@ function wrap(path, express, pug, GameSession) {
       return;
     }
 
-    const response = gameTemplate({ session });
+    const response = getTemplate('game.pug')({ session });
     res.send(response);
   });
 
-  app.listen(3000, function () {
+  io.on('connection', function(socket){
+    console.log('a user connected');
+  });
+
+  server.listen(3000, function () {
     console.log('Listening on port 3000');
   });
 }
 
 requirejs([
-  'path',
   'express',
+  'http',
+  'socket.io',
+  'path',
   'pug',
   'game-session'
 ], wrap);

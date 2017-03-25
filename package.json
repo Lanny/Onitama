@@ -24,6 +24,7 @@
     "gulp-babel": "^6.1.2",
     "pug": "^2.0.0-beta11",
     "requirejs": "^2.3.3",
+    "socket.io": "^1.7.3",
     "uuid": "^3.0.1",
     "yargs": "^7.0.2"
   },
