@@ -4,11 +4,18 @@ requirejs.config({
   nodeRequire: require
 });
 
-function wrap(express, http, socketIo, path, pug, GameSession) {
+function wrap(express, http, socketIo, path, pug, GameSession, AppError) {
   const app = express(),
     server = http.Server(app),
     io = socketIo(server),
     templateCache = {};
+
+  function AppError(message='Unspecified application error', type='PROTO') {
+    Error.call(this, message);
+    this.event = { message, type };
+  };
+
+  AppError.prototype = new Error();
 
   function getTemplate(name) {
     var templatePath = path.join(__dirname, '../assets/pug', name);
@@ -26,7 +33,7 @@ function wrap(express, http, socketIo, path, pug, GameSession) {
   
   app.get('/join-game', function(req, res) {
     for (let gid in app.locals.gameSessions) {
-      if (app.locals.gameSessions[gid].isAwaitingPlayer()) {
+      if (app.locals.gameSessions[gid].isAwaitingParticipant()) {
         res.redirect(`/game/${gid}`);
         return;
       }
@@ -50,7 +57,36 @@ function wrap(express, http, socketIo, path, pug, GameSession) {
   });
 
   io.on('connection', function(socket){
-    console.log('a user connected');
+    var session = null;
+
+    function on(event, handler) {
+      socket.on(event, (...handlerArgs) => {
+        try {
+          handler(...handlerArgs);
+        } catch (e) {
+          if (e instanceof AppError) {
+            socket.emit('applicationError', e.event);
+          } else {
+            throw e;
+          }
+        }
+      });
+    }
+
+    on('requestRole', function(msg) {
+      if (session !== null) {
+        throw new AppError(
+          'requestRole received when role has already been assigned');
+      }
+
+      session = app.locals.gameSessions[msg.gameSessionId];
+
+      if (!session) {
+        throw new AppError(`no such game: ${msg.gameSessionId}`);
+      }
+
+      session.acceptParticipant(socket);
+    });
   });
 
   server.listen(3000, function () {
@@ -64,5 +100,6 @@ requirejs([
   'socket.io',
   'path',
   'pug',
-  'game-session'
+  'game-session',
+  'application-error'
 ], wrap);
