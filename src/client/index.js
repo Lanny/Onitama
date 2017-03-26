@@ -21,6 +21,16 @@
         perspective = new Perspective(gameState, msg.color, svg);
     });
 
+    socket.on('participantDisconnected', function(msg) {
+      if (msg.color === WHITE) {
+        console.info('White has abandoned the game.');
+      } else if (msg.color === BLACK) {
+        console.info('Black has abandoned the game.');
+      } else {
+        console.info('An observer has stopped watching the game.');
+      }
+    });
+
     socket.on('roleAssigned', function(msg) {
       console.info(`New watcher joined, color: ${ msg.color }`);
     });

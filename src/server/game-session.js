@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap(uuid, Participant, game, {WHITE, BLACK, PARTICIPANT}) {
+  function wrap(uuid, Participant, game, utils, {WHITE, BLACK, PARTICIPANT}) {
     function GameSession() {
       this.white = null;
       this.black = null;
@@ -19,6 +19,8 @@
       },
       isAwaitingParticipant() {
         return this.white === null || this.black === null;
+      },
+      handleDisconnect(observer) {
       },
       acceptParticipant(socket) {
         var color, participant;
@@ -41,9 +43,17 @@
         this.observers.push(participant);
         this.broadcast(participant, 'roleAssigned', { color });
 
-        if (!this.gameState.started &&
-            this.black && this.black.isConnected() &&
-            this.white && this.white.isConnected()) {
+        participant.on('disconnect', () => {
+          utils.removeFromArray(this.observers, participant);
+          if (participant === this.black) this.black = null;
+          if (participant === this.white) this.white = null;
+
+          this.publish('participantDisconnected', {
+            color: participant.color
+          });
+        });
+
+        if (!this.gameState.started && this.black && this.white) {
           this.gameState.start();
           this.publish('gameStarted', {});
         }
@@ -57,6 +67,7 @@
     'uuid/v4',
     'participant',
     'game',
+    'utils',
     'colors'
   ], wrap);
 })();

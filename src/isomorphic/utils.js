@@ -62,7 +62,13 @@
       return newObj;
     }
 
-    return { Matrix, arrayEquals, clone };
+    function removeFromArray(arr, target) {
+      const idx = arr.indexOf(target);
+      arr.splice(idx, 1);
+      return arr;
+    }
+
+    return { Matrix, arrayEquals, clone, removeFromArray };
   }
 
   define([], wrap);
