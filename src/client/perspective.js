@@ -1,6 +1,6 @@
 ;(function() {
   function wrap(d3, game, utils) {
-    var cardSlots = {
+    const cardSlots = {
       'BLACK0': [5, 0],
       'BLACK1': [55, 0],
       'WHITE0': [5, 130],
@@ -88,13 +88,16 @@
       var border = 12.5;
 
       g.classed('card', true)
-        .attr('transform', 'scale(0.16)')
-        .append('rect')
-        .attr('width', 250)
-        .attr('height', 125)
-        .attr('fill', 'none')
-        .attr('stroke', 'black')
-        .attr('stroke-width', 1);
+        .attr('transform', 'scale(0.16)');
+
+      rectify(g, 'rect.background', [card],
+        selection => selection
+          .classed('background', true)
+          .attr('width', 250)
+          .attr('height', 125)
+          .attr('fill', 'white')
+          .attr('stroke', 'black')
+          .attr('stroke-width', 1));
 
       rectify(g, 'g.move-grid', [card],
         selection => selection
@@ -137,6 +140,7 @@
       this.svg = d3.select(svg);
       this.socket = socket;
 
+      this.cardPromptActive = false;
       this._activeCell = null;
 
       this._b = (this.color === 'WHITE') ? 4 : 0;
@@ -148,14 +152,20 @@
         .attr('transform', 'translate(0, 25)')
         .on('click', this.onBoardClick.bind(this));
 
+
       this.renderGridLines(this.svgBoard);
 
       this.svgBoard
         .append('g')
         .classed('pieces', true);
 
-      this.renderPieces(this.svgBoard);
-      this.renderCards(this.svg);
+      this.cardsGroup = this.svg.append('g')
+        .classed('cards-group', true);
+      this.cardPromptGroup = this.svg.append('g')
+        .classed('card-prompt', true);
+
+      this.renderPieces();
+      this.renderCards();
 
       this.watchStateChange();
     }
@@ -181,6 +191,46 @@
         });
 
         this.gameState.executeMove(initialPosition, targetPosition, card);
+      },
+      promptForCard() {
+        if (this.cardPromptActive) {
+          throw new Error('Card prompt already in progress.');
+        }
+
+        return new Promise((resolve, reject) => {
+          this.cardPromptActive = true;
+          this.cardPromptGroup.attr('display', 'block');
+          const options = this.gameState.getAvailableCards(this.color);
+          const cleanup = () => {
+            this.cardPromptActive = false;
+            this.cardPromptGroup.attr('display', 'none');
+          }
+
+          rectify(this.cardPromptGroup, 'rect.overlay', [null],
+            selection => selection
+              .classed('overlay', true)
+              .attr('fill', 'rgba(0,0,0,0.7)')
+              .attr('x', -1)
+              .attr('y', -1)
+              .attr('width', 152)
+              .attr('height', 152)
+              .on('click', () => {
+                cleanup();
+                reject();
+              }));
+
+          rectify(this.cardPromptGroup, 'g.card', options,
+            selection => selection
+              .each((card, i, nodes) => rectifyCard(d3.select(nodes[i]), card))
+              .attr('transform', (d, i) => (new utils.Matrix())
+                .scale(0.2)
+                .translate(16 + (i*67), 62.5)
+                .fmt())
+              .on('click', d => {
+                cleanup();
+                resolve(d);
+              }));
+        });
       },
       attemptSettingActiveCell(x, y) {
         if (this.gameState.started === false) {
@@ -217,8 +267,9 @@
 
           if (move !== undefined) {
             if (move.cards.length !== 1) {
-              alert('DON\'T KNOW WHAT TO DO YET LOL!');
-              return false;
+              this.promptForCard().then(
+                card => this.executePerspectiveMove([acx, acy], [x, y], card),
+                () => console.info('Player cancled card select'));
             } else {
               this.executePerspectiveMove([acx, acy], [x, y], move.cards[0]);
             }
@@ -243,8 +294,8 @@
           stateChangeInfo;
 
         const next = (info) => {
-          this.renderPieces(this.svgBoard);
-          this.renderCards(this.svg);
+          this.renderPieces();
+          this.renderCards();
 
           if (cont === true) {
             this.gameState.nextStateChange().then(next);
@@ -292,8 +343,8 @@
 
         drawGrid(gridLines, 'white');
       },
-      renderPieces(board) {
-        const piecesContainer = board.selectAll('g.pieces'),
+      renderPieces() {
+        const piecesContainer = this.svgBoard.selectAll('g.pieces'),
           data = this.gameState.getPieces();
 
         rectify(piecesContainer, 'image.piece', data,
@@ -305,15 +356,13 @@
             .attr('x', d => this._gridXToSvgX(d.x) - 7.2 )
             .attr('y', d => this._gridYToSvgY(d.y) - 7.5 ));
       },
-      renderCards(svg) {
-        var self = this;
-
-        rectify(svg, 'g.card', this.gameState.deck,
+      renderCards() {
+        rectify(this.cardsGroup, 'g.card', this.gameState.deck,
           selection => selection
           .each((card, i, nodes) => rectifyCard(d3.select(nodes[i]), card))
           .attr('transform', d => (new utils.Matrix())
             .scale(0.16)
-            .translate(...getCardCoords(d.hand, self.color))
+            .translate(...getCardCoords(d.hand, this.color))
             .fmt()));
       }
     };
