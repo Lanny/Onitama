@@ -17,8 +17,8 @@
         m = (perspective === 'WHITE') ? 1 : -1;
 
       return [
-        (cardSlots[position][0] - b) * m,
-        cardSlots[position][1]
+        cardSlots[position][0],
+        (cardSlots[position][1] - b) * m
       ];
     }
 
