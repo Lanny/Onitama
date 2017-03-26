@@ -21,6 +21,13 @@
         return this.white === null || this.black === null;
       },
       handleDisconnect(observer) {
+        utils.removeFromArray(this.observers, observer);
+        if (observer === this.black) this.black = null;
+        if (observer === this.white) this.white = null;
+
+        this.publish('participantDisconnected', {
+          color: observer.color
+        });
       },
       acceptParticipant(socket) {
         var color, participant;
@@ -43,15 +50,8 @@
         this.observers.push(participant);
         this.broadcast(participant, 'roleAssigned', { color });
 
-        participant.on('disconnect', () => {
-          utils.removeFromArray(this.observers, participant);
-          if (participant === this.black) this.black = null;
-          if (participant === this.white) this.white = null;
-
-          this.publish('participantDisconnected', {
-            color: participant.color
-          });
-        });
+        participant.on('disconnect',
+                       this.handleDisconnect.bind(this, participant));
 
         if (!this.gameState.started && this.black && this.white) {
           this.gameState.start();

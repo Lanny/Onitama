@@ -106,6 +106,10 @@
       validateMove(initialPosition, targetPosition, card) {
         const piece = this.getCellContents(...initialPosition);
 
+        if (!this.gameState.started) {
+          return false;
+        }
+
         if (piece === null || piece.getColor() !== this.currentTurn) {
           return false;
         }

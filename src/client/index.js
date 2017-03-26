@@ -12,10 +12,10 @@
     'colors'
   ], function(io, game, Perspective, {WHITE, BLACK}) {
     const socket = io.connect();
+    var gameState;
 
     socket.on('->assignRole', function(msg) {
-      const gameState = new game.GameState();
-      gameState.loadState(msg.gameState);
+      gameState = new game.GameState().loadState(msg.gameState);
 
       const svg = document.getElementById('game-board'),
         perspective = new Perspective(gameState, msg.color, svg);
@@ -37,6 +37,7 @@
 
     socket.on('gameStarted', function(msg) {
       console.info('Both players are present, the game begins.');
+      gameState.start();
     });
 
     socket.emit('requestRole', { gameSessionId: window.onifig.gameSessionId });

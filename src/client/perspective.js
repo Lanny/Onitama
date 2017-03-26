@@ -177,30 +177,11 @@
 
         this.gameState.executeMove(initialPosition, targetPosition, card);
       },
-      onBoardClick() {
-        var [x, y] = this._svgXYToGridXY(d3.mouse(this.svgBoard.node()));
-
-        // If we have an active cell and the user clicked on another cell,
-        // attempt to make that move.
-        if (this._activeCell && !utils.arrayEquals(this._activeCell, [x,y])) {
-          const {x: acx, y: acy} = this._activeCell,
-            move = this.gameState.gatherMoves([acx, acy])
-              .filter(move => utils.arrayEquals(move.cell, [x,y]))[0];
-
-          if (move !== undefined) {
-            if (move.cards.length !== 1) {
-              alert('DON\'T KNOW WHAT TO DO YET LOL!');
-            } else {
-              this.executeMove([acx, acy], [x, y], move.cards[0]);
-            }
-
-            this._activeCell = null;
-            this.updateCellHighlights();
-            return;
-          }
+      attemptSettingActiveCell(x, y) {
+        if (this.gameState.started === false) {
+          return false;
         }
 
-        // Otherwise try to update the active cell.
         var contents = this.gameState.getCellContents(x, y);
 
         if (contents !== null &&
@@ -214,9 +195,43 @@
           } else {
             this._activeCell = {x, y};
           }
-        }
 
-        this.updateCellHighlights();
+          this.updateCellHighlights();
+          return true;
+        } else {
+          return false;
+        }
+      },
+      attemptMovingPiece(x, y) {
+        // If we have an active cell and the user clicked on another cell,
+        // attempt to make that move.
+        if (this._activeCell && !utils.arrayEquals(this._activeCell, [x,y])) {
+          const {x: acx, y: acy} = this._activeCell,
+            move = this.gameState.gatherMoves([acx, acy])
+              .filter(move => utils.arrayEquals(move.cell, [x,y]))[0];
+
+          if (move !== undefined) {
+            if (move.cards.length !== 1) {
+              alert('DON\'T KNOW WHAT TO DO YET LOL!');
+              return false;
+            } else {
+              this.executeMove([acx, acy], [x, y], move.cards[0]);
+            }
+
+            this._activeCell = null;
+            this.updateCellHighlights();
+
+            return true;
+          }
+
+          return false;
+        }
+      },
+      onBoardClick() {
+        var [x, y] = this._svgXYToGridXY(d3.mouse(this.svgBoard.node()));
+
+        if (this.attemptMovingPiece(x,y)) return;
+        if (this.attemptSettingActiveCell(x,y)) return;
       },
       watchStateChange: (function() {
         var cont = true,
