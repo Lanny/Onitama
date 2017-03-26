@@ -103,34 +103,61 @@
         this._nextStatePromise = new Promise(
           (resolve,_) => this._nextStateResolve = resolve);
       },
+      localizeCard(cardData) {
+        const card = this.deck.filter(lc => lc.name === cardData.name)[0];
+
+        if (!card) {
+          throw new Error(`Card with name ${card.name} not in deck`);
+        }
+
+        return card
+      },
       validateMove(initialPosition, targetPosition, card) {
         const piece = this.getCellContents(...initialPosition);
 
-        if (!this.gameState.started) {
-          return false;
+        if (!this.started) {
+          return {
+            valid: false,
+            reason: 'The game hasn\'t started yet.'
+          };
         }
 
         if (piece === null || piece.getColor() !== this.currentTurn) {
-          return false;
+          return {
+            valid: false,
+            reason: 'Piece to move does not belong to the current player.'
+          };
         }
 
         const move = this.gatherMoves(initialPosition)
           .filter(move => utils.arrayEquals(move.cell, targetPosition))[0];
 
         if (move === undefined) {
-          return false;
+          return {
+            valid: false,
+            reason: 'There is no way for the current player to make this ' +
+              'move with their current cards.'
+          };
         }
 
         const cardWorks = !!(move.cards
           .filter(moveCard => moveCard === card)
           .length);
 
-        return cardWorks;
+        if (!cardWorks) {
+          return {
+            valid: false,
+            reason: 'The selected card can not move in that way.'
+          };
+        }
+
+        return { valid: true };
       },
       executeMove(initialPosition, targetPosition, card) {
-        if (!this.validateMove(initialPosition, targetPosition, card)) {
+        if (!this.validateMove(initialPosition, targetPosition, card).valid) {
           throw new Error('Invalid move!');
         }
+
 
         const [ix, iy] = initialPosition,
           [tx, ty] = targetPosition;

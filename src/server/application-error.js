@@ -1,12 +1,15 @@
 ;(function() {
   function wrap() {
-    function ApplicationError(message='Unspecified application error',
-                              type='PROTO') {
-      Error.call(this, message);
-      this.event = { message, type };
-    }
+    class ApplicationError extends Error {
+      constructor(message='Unspecified application error',
+                  type='PROTO') {
+        super(message);
+        Object.defineProperty(this, "name", { value: this.constructor.name });
+        Error.captureStackTrace(this, this.constructor);
 
-    ApplicationError.prototype = new Error();
+        this.event = { message, type };
+      }
+    }
 
     return ApplicationError;
   };

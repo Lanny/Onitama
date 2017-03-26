@@ -10,18 +10,11 @@ requirejs.config({
   }
 });
 
-function wrap(express, http, socketIo, path, pug, GameSession, AppError) {
+function wrap(express, http, socketIo, path, pug, GameSession, ApplicationError) {
   const app = express(),
     server = http.Server(app),
     io = socketIo(server),
     templateCache = {};
-
-  function AppError(message='Unspecified application error', type='PROTO') {
-    Error.call(this, message);
-    this.event = { message, type };
-  };
-
-  AppError.prototype = new Error();
 
   function getTemplate(name) {
     var templatePath = path.join(__dirname, '../assets/pug', name);
@@ -63,14 +56,15 @@ function wrap(express, http, socketIo, path, pug, GameSession, AppError) {
   });
 
   io.on('connection', function(socket){
-    var session = null;
+    var session = null,
+      participant = null;
 
     function on(event, handler) {
       socket.on(event, (...handlerArgs) => {
         try {
           handler(...handlerArgs);
         } catch (e) {
-          if (e instanceof AppError) {
+          if (e instanceof ApplicationError) {
             socket.emit('applicationError', e.event);
           } else {
             throw e;
@@ -81,17 +75,30 @@ function wrap(express, http, socketIo, path, pug, GameSession, AppError) {
 
     on('requestRole', function(msg) {
       if (session !== null) {
-        throw new AppError(
-          'requestRole received when role has already been assigned');
+        throw new ApplicationError(
+          'requestRole received when role has already been assigned',
+          'INVALID_SEQUENCE');
       }
 
       session = app.locals.gameSessions[msg.gameSessionId];
 
       if (!session) {
-        throw new AppError(`no such game: ${msg.gameSessionId}`);
+        throw new ApplicationError(
+          `no such game: ${msg.gameSessionId}`,
+          'INVALID_SEQUENCE');
       }
 
-      session.acceptParticipant(socket);
+      participant = session.acceptParticipant(socket);
+    });
+
+    on('->makeMove', function(msg) {
+      if (session === null || participant === null) {
+          throw new ApplicationError(
+            'Game session or participant records missing.',
+            'INVALID_SEQUENCE');
+      }
+
+      session.submitMove(msg, participant);
     });
   });
 

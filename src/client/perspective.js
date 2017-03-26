@@ -131,10 +131,11 @@
           .attr('y', 65));
     }
 
-    function Perspective(gameState, color, svg) {
+    function Perspective(gameState, color, svg, socket) {
       this.gameState = gameState;
       this.color = color;
       this.svg = d3.select(svg);
+      this.socket = socket;
 
       this._activeCell = null;
 
@@ -172,8 +173,12 @@
           (~~(sy / 20)) / this._m + this._b,
         ];
       },
-      executeMove(initialPosition, targetPosition, card) {
-        // TODO: broadcast this move to the server
+      executePerspectiveMove(initialPosition, targetPosition, card) {
+        this.socket.emit('->makeMove', {
+          initialPosition: initialPosition,
+          targetPosition: targetPosition,
+          card: card.serialize()
+        });
 
         this.gameState.executeMove(initialPosition, targetPosition, card);
       },
@@ -215,7 +220,7 @@
               alert('DON\'T KNOW WHAT TO DO YET LOL!');
               return false;
             } else {
-              this.executeMove([acx, acy], [x, y], move.cards[0]);
+              this.executePerspectiveMove([acx, acy], [x, y], move.cards[0]);
             }
 
             this._activeCell = null;

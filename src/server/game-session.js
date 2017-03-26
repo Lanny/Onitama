@@ -1,5 +1,6 @@
 ;(function() {
-  function wrap(uuid, Participant, game, utils, {WHITE, BLACK, PARTICIPANT}) {
+  function wrap(uuid, Participant, game, utils, AppError, cards,
+                {WHITE, BLACK, PARTICIPANT}) {
     function GameSession() {
       this.white = null;
       this.black = null;
@@ -57,6 +58,37 @@
           this.gameState.start();
           this.publish('gameStarted', {});
         }
+
+        return participant;
+      },
+      submitMove(move, participant) {
+        const piece = this.gameState.getCellContents(...move.initialPosition),
+          card = this.gameState.localizeCard(move.card);
+
+        if (!piece || piece.getColor() !== participant.color) {
+          throw new AppError(
+            `Piece at ${move.initialPosition} does not belong to ${participant.color}`,
+            'INVALID_MOVE');
+        }
+
+        const validation = this.gameState.validateMove(
+          move.initialPosition,
+          move.targetPosition,
+          card);
+
+        if (!validation.valid) {
+          throw new AppError(
+            `Move did not validate. Reason: ${validation.reason}`,
+            'INVALID_MOVE');
+        } else {
+          this.gameState.executeMove(
+            move.initialPosition,
+            move.targetPosition,
+            card);
+
+          participant.emit('moveAccepted', move);
+          this.broadcast(participant, 'moveMade', move);
+        }
       }
     };
 
@@ -68,6 +100,8 @@
     'participant',
     'game',
     'utils',
+    'application-error',
+    'cards',
     'colors'
   ], wrap);
 })();

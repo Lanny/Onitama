@@ -9,8 +9,9 @@
     'socket.io',
     'game',
     'perspective',
+    'cards',
     'colors'
-  ], function(io, game, Perspective, {WHITE, BLACK}) {
+  ], function(io, game, Perspective, cards, {WHITE, BLACK}) {
     const socket = io.connect();
     var gameState;
 
@@ -18,7 +19,7 @@
       gameState = new game.GameState().loadState(msg.gameState);
 
       const svg = document.getElementById('game-board'),
-        perspective = new Perspective(gameState, msg.color, svg);
+        perspective = new Perspective(gameState, msg.color, svg, socket);
     });
 
     socket.on('participantDisconnected', function(msg) {
@@ -40,6 +41,25 @@
       gameState.start();
     });
 
+    socket.on('moveAccepted', function(msg) {
+      console.info('Last move was accepted by the server.');
+    });
+
+    socket.on('moveMade', function(msg) {
+      console.info('Received a new move from the server', msg);
+      const card = gameState.localizeCard(msg.card);
+
+      gameState.executeMove(
+        msg.initialPosition,
+        msg.targetPosition,
+        card);
+    });
+
+    socket.on('applicationError', function(msg) {
+      console.error('Application error!', msg);
+    });
+
     socket.emit('requestRole', { gameSessionId: window.onifig.gameSessionId });
   });
+
 })();
