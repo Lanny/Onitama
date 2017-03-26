@@ -1,7 +1,5 @@
 ;(function() {
-  function wrap(cards, utils) {
-    var WHITE = 'WHITE',
-      BLACK = 'BLACK';
+  function wrap(cards, utils, {BLACK, WHITE}) {
 
     function drawCard(deck) {
       var idx = ~~(Math.random() * deck.length);
@@ -170,6 +168,7 @@
           .hand = card.hand;
 
         card.hand = 'TRANSFER';
+        this.currentTurn = (this.currentTurn === WHITE) ? BLACK : WHITE;
 
         this._executeStateChange({
           type: 'TURN',
@@ -203,10 +202,9 @@
         return this.deck.filter(c => c.hand.substring(0,5) === player);
       },
       _gatherMovesForCard(color, card, [cx, cy]) {
-        var b = (color === BLACK) ? 4: 0,
-          m = (color === BLACK) ? -1 : 1,
+        const m = (color === WHITE) ? 1 : -1,
           validMoves = card.getMoves()
-            .map(([x,y]) => [(x-b) * m, (y-b) * m])
+            .map(([x,y]) => [x * m, y * m])
             .map(([x,y]) => [x+cx, y+cy])
             .filter(([x,y]) => x > -1 && x < 5 && y > -1 && y < 5)
             .filter(([x,y]) => {
@@ -301,6 +299,7 @@
 
   define([
     'cards',
-    'utils'
+    'utils',
+    'colors'
   ], wrap);
 })();
