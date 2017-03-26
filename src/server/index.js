@@ -1,7 +1,13 @@
 var requirejs = require('requirejs');
 
 requirejs.config({
-  nodeRequire: require
+  nodeRequire: require,
+  paths: {
+    'game': '../isomorphic/game',
+    'colors': '../isomorphic/colors',
+    'cards': '../isomorphic/cards',
+    'utils': '../isomorphic/utils'
+  }
 });
 
 function wrap(express, http, socketIo, path, pug, GameSession, AppError) {

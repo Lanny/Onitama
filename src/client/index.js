@@ -14,8 +14,10 @@
     const socket = io.connect();
 
     socket.on('->assignRole', function(msg) {
-      var gameState = new game.GameState(),
-        svg = document.getElementById('game-board'),
+      const gameState = new game.GameState();
+      gameState.loadState(msg.gameState);
+
+      const svg = document.getElementById('game-board'),
         perspective = new Perspective(gameState, msg.color, svg);
     });
 

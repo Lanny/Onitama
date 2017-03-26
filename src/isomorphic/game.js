@@ -42,6 +42,12 @@
       },
       getSvgPath: function() {
         throw Error('Not Implemented');
+      },
+      serialize: function() {
+        return {
+          color: this._color,
+          type: this.getType()
+        };
       }
     };
 
@@ -64,12 +70,13 @@
     function GameState() {
       this.board = null;
       this.deck = null;
-
-      this.init();
+      this._nextStateResolve = null;
+      this._nextStatePromise = new Promise(
+        (resolve,_) => this._nextStateResolve = resolve);
     }
 
     GameState.prototype = {
-      init() {
+      initialize() {
         this.board = [
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
@@ -86,9 +93,8 @@
         this.deck[4].hand = 'TRANSFER';
 
         this.currentTurn = WHITE;
-        this._nextStateResolve = null;
-        this._nextStatePromise = new Promise(
-          (resolve,_) => this._nextStateResolve = resolve);
+
+        return this;
       },
       _executeStateChange(info) {
         this._nextStateResolve(info);
@@ -213,6 +219,32 @@
       },
       nextStateChange: function() {
         return this._nextStatePromise;
+      },
+      serialize: function() {
+        const serializeCell = c => (c === null) ? null : c.serialize()
+        return {
+          board: this.board.map(row => row.map(serializeCell)),
+          deck: this.deck.map(card => card.serialize()),
+          currentTurn: this.currentTurn
+        };
+      },
+      loadState(state) {
+        this.board = state.board.map(row => row.map(piece => {
+          if (piece === null) {
+            return null;
+          } else if (piece.type === 'MASTER') {
+            return new Master(piece.color);
+          } else if (piece.type === 'STUDENT') {
+            return new Student(piece.color);
+          } else {
+            throw Error('Unexpected board entry:' + piece);
+          }
+        }));
+
+        this.deck = state.deck.map(cards.loadCard);
+        this.currentTurn = state.currentTurn;
+
+        return this;
       }
     };
 
