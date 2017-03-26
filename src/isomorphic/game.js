@@ -70,6 +70,7 @@
     function GameState() {
       this.board = null;
       this.deck = null;
+      this.started = null;
       this._nextStateResolve = null;
       this._nextStatePromise = new Promise(
         (resolve,_) => this._nextStateResolve = resolve);
@@ -92,6 +93,7 @@
         this.deck[3].hand = 'BLACK1';
         this.deck[4].hand = 'TRANSFER';
 
+        this.started = false;
         this.currentTurn = WHITE;
 
         return this;
@@ -139,6 +141,7 @@
         card.hand = 'TRANSFER';
 
         this._executeStateChange({
+          type: 'TURN',
           player: this.currentTurn,
           initialPosition: initialPosition,
           targetPosition: targetPosition,
@@ -217,6 +220,12 @@
 
         return combinedMoveList;
       },
+      start: function() {
+        this.started = true;
+        this._executeStateChange({
+          type: 'START'
+        });
+      },
       nextStateChange: function() {
         return this._nextStatePromise;
       },
@@ -225,7 +234,8 @@
         return {
           board: this.board.map(row => row.map(serializeCell)),
           deck: this.deck.map(card => card.serialize()),
-          currentTurn: this.currentTurn
+          currentTurn: this.currentTurn,
+          started: this.started
         };
       },
       loadState(state) {
@@ -243,6 +253,7 @@
 
         this.deck = state.deck.map(cards.loadCard);
         this.currentTurn = state.currentTurn;
+        this.started = state.started;
 
         return this;
       }

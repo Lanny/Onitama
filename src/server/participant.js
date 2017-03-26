@@ -14,6 +14,9 @@ function wrap() {
     },
     emit(...args) {
       this.socket.emit(...args);
+    },
+    isConnected() {
+      return true;
     }
   }
 

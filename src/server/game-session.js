@@ -40,6 +40,13 @@
 
         this.observers.push(participant);
         this.broadcast(participant, 'roleAssigned', { color });
+
+        if (!this.gameState.started &&
+            this.black && this.black.isConnected() &&
+            this.white && this.white.isConnected()) {
+          this.gameState.start();
+          this.publish('gameStarted', {});
+        }
       }
     };
 

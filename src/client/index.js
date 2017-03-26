@@ -25,6 +25,10 @@
       console.info(`New watcher joined, color: ${ msg.color }`);
     });
 
+    socket.on('gameStarted', function(msg) {
+      console.info('Both players are present, the game begins.');
+    });
+
     socket.emit('requestRole', { gameSessionId: window.onifig.gameSessionId });
   });
 })();
