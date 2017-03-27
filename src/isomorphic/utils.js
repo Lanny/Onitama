@@ -9,23 +9,48 @@
     }
 
     Matrix.prototype = {
-      translate: function(x, y) {
+      multiply(matrix) {
+        const A = this._data,
+          B = matrix._data;
+
+        return new Matrix([
+          A[0]*B[0] + A[2]*B[1],
+          A[1]*B[0] + A[3]*B[1],
+          A[0]*B[2] + A[2]*B[3],
+          A[1]*B[2] + A[3]*B[3],
+          A[4] + B[4],
+          A[5] + B[5]
+        ]);
+      },
+      translate(x, y) {
         var newData = this._data.slice();
         newData[4] += x;
         newData[5] += y;
 
         return new Matrix(newData);
       },
-      scale: function(x,y) {
+      scale(x,y) {
         var newData = this._data.slice();
         y = (y === undefined) ? x : y;
 
         newData[0] *= x;
+        newData[1] *= x;
+        newData[2] *= y;
         newData[3] *= y;
 
         return new Matrix(newData);
       },
-      fmt: function() {
+      rotate(theta) {
+        return this.multiply(new Matrix([
+          Math.cos(theta),
+          Math.sin(theta),
+          0-Math.sin(theta),
+          Math.cos(theta),
+          0,
+          0
+        ]));
+      },
+      fmt() {
         return `matrix(${this._data.join(',')})`;
       }
     };

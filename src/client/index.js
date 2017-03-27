@@ -24,6 +24,7 @@
       const svg = document.getElementById('game-board'),
         perspective = new Perspective(gameState, msg.color, svg, socket, logger);
 
+      logger.setPerspective(perspective);
       logger.info(`Joined game as ${ utils.niceName(msg.color) }.`);
     });
 
@@ -54,7 +55,7 @@
       const card = gameState.localizeCard(msg.card),
         color = gameState.getCellContents(...msg.initialPosition).getColor();
 
-      logger.info(`The ${ utils.niceName(color) } player moved from ${ utils.niceCoords(msg.initialPosition) } to ${ utils.niceCoords(msg.targetPosition) } by playing the ${ card.name } card.`);
+      logger.logMove(`The ${ utils.niceName(color) } player moved from ${ utils.niceCoords(msg.initialPosition) } to ${ utils.niceCoords(msg.targetPosition) } by playing the ${ card.name } card.`, msg);
 
       gameState.executeMove(
         msg.initialPosition,

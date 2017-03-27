@@ -22,6 +22,24 @@
       ];
     }
 
+    function arrowPath(length, thickness) {
+      const path = d3.path(),
+        ht = thickness / 2,
+        flangeX = length - Math.cos(Math.PI/4) * thickness * 2;
+
+      path.moveTo(0, ht);
+      path.lineTo(0, -ht);
+      path.lineTo(0, -ht);
+      path.lineTo(flangeX, -ht);
+      path.lineTo(flangeX, -thickness);
+      path.lineTo(length, 0);
+      path.lineTo(flangeX, thickness);
+      path.lineTo(flangeX, ht);
+      path.lineTo(0, ht);
+
+      return path.toString();
+    }
+
     function drawGrid(g, fill='none') {
       g.append('rect')
         .attr('x', 0)
@@ -117,6 +135,7 @@
       this.logger = logger;
 
       this.cardPromptActive = false;
+      this.moveIndicators = [];
       this._activeCell = null;
 
       this._b = (this.color === 'WHITE') ? 4 : 0;
@@ -131,12 +150,15 @@
 
       this.renderGridLines(this.svgBoard);
 
-      this.svgBoard
-        .append('g')
+      this.pieceGroup = this.svgBoard.append('g')
         .classed('pieces', true);
+
+      this.moveIndicatorGroup = this.svgBoard.append('g')
+        .classed('move-indicators', true);
 
       this.cardsGroup = this.svg.append('g')
         .classed('cards-group', true);
+
       this.cardPromptGroup = this.svg.append('g')
         .classed('card-prompt', true);
 
@@ -159,16 +181,51 @@
           (~~(sy / 20)) / this._m + this._b,
         ];
       },
+      rectifyMoveIndicators() {
+        rectify(this.moveIndicatorGroup, 'path.move-indicator', this.moveIndicators,
+          selection => selection
+          .attr('d', d => {
+            const a = d.initialPosition[0] - d.targetPosition[0],
+              b = d.initialPosition[1] - d.targetPosition[1],
+              length = Math.sqrt(a * a + b * b);
+
+            return arrowPath(length, 0.1);
+          })
+          .attr('transform', d => {
+            const isx = this._gridXToSvgX(d.initialPosition[0]),
+              isy = this._gridYToSvgY(d.initialPosition[1]),
+              tsx = this._gridXToSvgX(d.targetPosition[0]),
+              tsy = this._gridYToSvgY(d.targetPosition[1]);
+
+            var mat = (new utils.Matrix())
+              .rotate(Math.atan2(tsy-isy, tsx-isx))
+              .scale(20)
+              .translate(isx, isy)
+              .fmt();
+
+            console.log(mat);
+
+            return mat;
+            }));
+
+      },
+      showMove(move) {
+        this.moveIndicators = [move];
+        this.rectifyMoveIndicators();
+      },
+      clearShownMoves() {
+        this.moveIndicators = [];
+        this.rectifyMoveIndicators();
+      },
       executePerspectiveMove(initialPosition, targetPosition, card) {
-        this.socket.emit('->makeMove', {
+        const move = {
           initialPosition: initialPosition,
           targetPosition: targetPosition,
           card: card.serialize()
-        });
+        };
 
-        this.logger.info(`You moved from ${ utils.niceCoords(initialPosition) } to ${ utils.niceCoords(targetPosition) } by playing the ${ card.name } card.`);
-        
-
+        this.socket.emit('->makeMove', move);
+        this.logger.logMove(`You moved from ${ utils.niceCoords(initialPosition) } to ${ utils.niceCoords(targetPosition) } by playing the ${ card.name } card.`, move);
         this.gameState.executeMove(initialPosition, targetPosition, card);
       },
       promptForCard() {
