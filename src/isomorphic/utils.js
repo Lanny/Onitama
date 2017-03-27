@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap() {
+  function wrap({WHITE, BLACK, PARTICIPANT}) {
     function Matrix(data) {
       if (data === undefined) {
         this._data = [1, 0, 0, 1, 0, 0];
@@ -68,8 +68,35 @@
       return arr;
     }
 
-    return { Matrix, arrayEquals, clone, removeFromArray };
+    function niceName(color, includeArticle=false) {
+      if (includeArticle && color === PARTICIPANT) {
+        return 'a spectator';
+      }
+
+      switch (color) {
+        case WHITE: return 'white';
+        case BLACK: return 'black';
+        case PARTICIPANT: return 'spepctator';
+        default: throw Error('Invalid color: ' + color);
+      }
+    }
+
+    const rank = ['1', '2', '3', '4', '5'],
+      file = ['a', 'b', 'c', 'd', 'e'];
+
+    function niceCoords([x,y]) {
+      return `${ rank[x] }${ file[y] }`;
+    }
+
+    return {
+      Matrix,
+      arrayEquals,
+      clone,
+      removeFromArray,
+      niceName,
+      niceCoords
+    };
   }
 
-  define([], wrap);
+  define(['colors'], wrap);
 })();

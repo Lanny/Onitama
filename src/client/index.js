@@ -10,16 +10,21 @@
     'game',
     'perspective',
     'cards',
+    'logger',
+    'utils',
     'colors'
-  ], function(io, game, Perspective, cards, {WHITE, BLACK}) {
-    const socket = io.connect();
+  ], function(io, game, Perspective, cards, Logger, utils, {WHITE, BLACK}) {
+    const socket = io.connect(),
+      logger = new Logger(document.getElementById('game-log'));
     var gameState;
 
     socket.on('->assignRole', function(msg) {
       gameState = new game.GameState().loadState(msg.gameState);
 
       const svg = document.getElementById('game-board'),
-        perspective = new Perspective(gameState, msg.color, svg, socket);
+        perspective = new Perspective(gameState, msg.color, svg, socket, logger);
+
+      logger.info(`Joined game as ${ utils.niceName(msg.color) }.`);
     });
 
     socket.on('participantDisconnected', function(msg) {
@@ -33,11 +38,11 @@
     });
 
     socket.on('roleAssigned', function(msg) {
-      console.info(`New watcher joined, color: ${ msg.color }`);
+      logger.info(`${ utils.niceName(msg.color) } has joined the game.`);
     });
 
     socket.on('gameStarted', function(msg) {
-      console.info('Both players are present, the game begins.');
+      logger.info('Both players are present, the game begins.');
       gameState.start();
     });
 
@@ -46,8 +51,10 @@
     });
 
     socket.on('moveMade', function(msg) {
-      console.info('Received a new move from the server', msg);
-      const card = gameState.localizeCard(msg.card);
+      const card = gameState.localizeCard(msg.card),
+        color = gameState.getCellContents(...msg.initialPosition).getColor();
+
+      logger.info(`The ${ utils.niceName(color) } player moved from ${ utils.niceCoords(msg.initialPosition) } to ${ utils.niceCoords(msg.targetPosition) } by playing the ${ card.name } card.`);
 
       gameState.executeMove(
         msg.initialPosition,
@@ -56,9 +63,10 @@
     });
 
     socket.on('applicationError', function(msg) {
-      console.error('Application error!', msg);
+      logger.error('Application error!' + msg);
     });
 
+    logger.info('Joining game...');
     socket.emit('requestRole', { gameSessionId: window.onifig.gameSessionId });
   });
 

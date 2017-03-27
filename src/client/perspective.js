@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap(d3, game, utils) {
+  function wrap(d3, game, utils, {rectify}) {
     const cardSlots = {
       'BLACK0': [5, 0],
       'BLACK1': [55, 0],
@@ -20,31 +20,6 @@
         cardSlots[position][0],
         (cardSlots[position][1] - b) * m
       ];
-    }
-
-    function extractTagType(selector) {
-      var els = selector.split(/[> ]/g),
-        tag = els[els.length-1],
-        tagName = tag.split(/[#\.]/)[0];
-
-      return tagName;
-    }
-
-    function rectify(parent, selector, data, applyProps) {
-      var elements = parent
-        .selectAll(selector)
-        .data(data);
-
-      elements
-        .exit()
-        .remove();
-
-      var enterSelection = elements
-        .enter()
-        .append(extractTagType(selector));
-
-      applyProps(enterSelection);
-      applyProps(elements);
     }
 
     function drawGrid(g, fill='none') {
@@ -134,11 +109,12 @@
           .attr('y', 65));
     }
 
-    function Perspective(gameState, color, svg, socket) {
+    function Perspective(gameState, color, svg, socket, logger) {
       this.gameState = gameState;
       this.color = color;
       this.svg = d3.select(svg);
       this.socket = socket;
+      this.logger = logger;
 
       this.cardPromptActive = false;
       this._activeCell = null;
@@ -189,6 +165,9 @@
           targetPosition: targetPosition,
           card: card.serialize()
         });
+
+        this.logger.info(`You moved from ${ utils.niceCoords(initialPosition) } to ${ utils.niceCoords(targetPosition) } by playing the ${ card.name } card.`);
+        
 
         this.gameState.executeMove(initialPosition, targetPosition, card);
       },
@@ -373,6 +352,7 @@
   define([
     'd3',
     'game',
-    'utils'
+    'utils',
+    'client-utils'
   ], wrap);
 })();
