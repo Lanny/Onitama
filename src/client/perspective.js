@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap(d3, game, utils, {rectify}) {
+  function wrap(d3, game, utils, {WHITE, BLACK}, {rectify}) {
     const cardSlots = {
       'BLACK0': [5, 0],
       'BLACK1': [55, 0],
@@ -13,8 +13,8 @@
         return cardSlots[position];
       }
 
-      var b = (perspective === 'WHITE') ? 0 : 130,
-        m = (perspective === 'WHITE') ? 1 : -1;
+      var b = (perspective === WHITE) ? 0 : 130,
+        m = (perspective === WHITE) ? 1 : -1;
 
       return [
         cardSlots[position][0],
@@ -138,8 +138,8 @@
       this.moveIndicators = [];
       this._activeCell = null;
 
-      this._b = (this.color === 'WHITE') ? 4 : 0;
-      this._m = (this.color === 'WHITE') ? -1 : 1;
+      this._b = (this.color === WHITE) ? 4 : 0;
+      this._m = (this.color === WHITE) ? -1 : 1;
 
       this.svg.attr('viewBox', '-1 -1 152 152');
 
@@ -184,30 +184,29 @@
       rectifyMoveIndicators() {
         rectify(this.moveIndicatorGroup, 'path.move-indicator', this.moveIndicators,
           selection => selection
-          .attr('d', d => {
-            const a = d.initialPosition[0] - d.targetPosition[0],
-              b = d.initialPosition[1] - d.targetPosition[1],
-              length = Math.sqrt(a * a + b * b);
+            .classed('move-indicator', true)
+            .attr('d', d => {
+              const a = d.initialPosition[0] - d.targetPosition[0],
+                b = d.initialPosition[1] - d.targetPosition[1],
+                length = Math.sqrt(a * a + b * b);
 
-            return arrowPath(length, 0.1);
-          })
-          .attr('transform', d => {
-            const isx = this._gridXToSvgX(d.initialPosition[0]),
-              isy = this._gridYToSvgY(d.initialPosition[1]),
-              tsx = this._gridXToSvgX(d.targetPosition[0]),
-              tsy = this._gridYToSvgY(d.targetPosition[1]);
+              return arrowPath(length, 0.1);
+            })
+            .attr('transform', d => {
+              const isx = this._gridXToSvgX(d.initialPosition[0]),
+                isy = this._gridYToSvgY(d.initialPosition[1]),
+                tsx = this._gridXToSvgX(d.targetPosition[0]),
+                tsy = this._gridYToSvgY(d.targetPosition[1]);
 
-            var mat = (new utils.Matrix())
-              .rotate(Math.atan2(tsy-isy, tsx-isx))
-              .scale(20)
-              .translate(isx, isy)
-              .fmt();
-
-            console.log(mat);
-
-            return mat;
-            }));
-
+              return (new utils.Matrix())
+                .rotate(Math.atan2(tsy-isy, tsx-isx))
+                .scale(20)
+                .translate(isx, isy)
+                .fmt();
+              })
+              .attr('stroke', d => (d.color===WHITE)?'black':'white')
+              .attr('stroke-width', 0.01)
+              .attr('fill', d => (d.color===WHITE)?'white':'black'));
       },
       showMove(move) {
         this.moveIndicators = [move];
@@ -221,7 +220,8 @@
         const move = {
           initialPosition: initialPosition,
           targetPosition: targetPosition,
-          card: card.serialize()
+          card: card.serialize(),
+          color: this.color
         };
 
         this.socket.emit('->makeMove', move);
@@ -410,6 +410,7 @@
     'd3',
     'game',
     'utils',
+    'colors',
     'client-utils'
   ], wrap);
 })();
