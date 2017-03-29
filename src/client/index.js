@@ -14,7 +14,7 @@
     'utils',
     'colors'
   ], function(io, game, Perspective, cards, Logger, utils, {WHITE, BLACK}) {
-    const socket = io.connect(),
+    const socket = io.connect('/sockets/game'),
       logger = new Logger(document.getElementById('game-log'));
     var gameState;
 

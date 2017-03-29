@@ -14,6 +14,8 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
   const app = express(),
     server = http.Server(app),
     io = socketIo(server),
+    lobbyNS = io.of('/sockets/lobby'),
+    gameNS = io.of('/sockets/game'),
     templateCache = {},
     PORT = process.env.PORT || 3000;
 
@@ -56,7 +58,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
     res.send(response);
   });
 
-  io.on('connection', function(socket){
+  gameNS.on('connection', function(socket){
     var session = null,
       participant = null;
 
