@@ -32,15 +32,13 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
   app.locals.gameSessions = {};
 
   app.use('/static', express.static(path.join(__dirname, '../../build/static')));
-  
-  app.get('/join-game', function(req, res) {
-    for (let gid in app.locals.gameSessions) {
-      if (app.locals.gameSessions[gid].isAwaitingParticipant()) {
-        res.redirect(`/game/${gid}`);
-        return;
-      }
-    }
 
+  app.get('/', function(req, res) {
+    const response = getTemplate('lobby.pug')();
+    res.send(response);
+  });
+  
+  app.get('/create-game', function(req, res) {
     const gameSession = new GameSession();
     app.locals.gameSessions[gameSession.id] = gameSession;
     res.redirect(`/game/${gameSession.id}`);
@@ -58,7 +56,30 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
     res.send(response);
   });
 
-  gameNS.on('connection', function(socket){
+  function serializeGameList() {
+    const games = [];
+    for (let gameId in app.locals.gameSessions) {
+      const gameSession = app.locals.gameSessions[gameId];
+      games.push({
+        id: gameSession.id,
+        name: gameSession.id,
+        spectators: gameSession.getSpectators(),
+        state: gameSession.getState()
+      });
+    }
+
+    return games;
+  }
+
+  lobbyNS.on('connection', function(socket) {
+    socket.on('requestGameList', function() {
+      socket.emit('gameList', {
+        games: serializeGameList()
+      });
+    });
+  });
+
+  gameNS.on('connection', function(socket) {
     var session = null,
       participant = null;
 

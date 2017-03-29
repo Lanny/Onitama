@@ -89,6 +89,16 @@
           participant.emit('moveAccepted', move);
           this.broadcast(participant, 'moveMade', move);
         }
+      },
+      getSpectators() {
+        return Math.min(this.observers.length - 2, 0);
+      },
+      getState() {
+        if (!this.gameState.started) {
+          return 'awaiting players';
+        } else {
+          return 'in progresss';
+        }
       }
     };
 
