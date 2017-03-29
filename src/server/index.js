@@ -41,6 +41,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
   app.get('/create-game', function(req, res) {
     const gameSession = new GameSession();
     app.locals.gameSessions[gameSession.id] = gameSession;
+    lobbyNS.emit('gameList', { games: serializeGameList() });
     res.redirect(`/game/${gameSession.id}`);
   });
 

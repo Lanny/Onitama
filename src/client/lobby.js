@@ -17,14 +17,16 @@
       d3.select('tr.loading').remove();
 
       rectify(gameTable, 'tr.game-row', msg.games,
-        selection => selection.each((data, i, nodes) => {
-          const el = d3.select(nodes[i]);
-          el.append('td').text(data.name);
-          el.append('td').text('N/A');
-          el.append('td').text(data.state);
-          el.append('td').text(data.spectators);
-          el.append('td').text('CTA!');
-        }))
+        selection => selection.classed('game-row', true)
+          .html('')
+          .each((data, i, nodes) => {
+            const el = d3.select(nodes[i]);
+            el.append('td').text(data.name);
+            el.append('td').text('N/A');
+            el.append('td').text(data.state);
+            el.append('td').text(data.spectators);
+            el.append('td').text('CTA!');
+          }))
     });
 
     socket.emit('requestGameList', {});
