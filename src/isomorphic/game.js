@@ -255,8 +255,19 @@
           type: 'START'
         });
       },
-      nextStateChange: function() {
+      nextStateChange() {
         return this._nextStatePromise;
+      },
+      onStateChange(handler) {
+        const next  = () => {
+          this.nextStateChange()
+            .then(info => {
+              handler(info);
+              next();
+            });
+        }
+
+        next();
       },
       serialize: function() {
         const serializeCell = c => (c === null) ? null : c.serialize()

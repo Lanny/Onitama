@@ -326,21 +326,10 @@
         if (this.attemptSettingActiveCell(x,y)) return;
       },
       watchStateChange: (function() {
-        var cont = true,
-          stateChangeInfo;
-
-        const next = (info) => {
+        this.gameState.onStateChange(info => {
           this.renderPieces();
           this.renderCards();
-
-          if (cont === true) {
-            this.gameState.nextStateChange().then(next);
-          } else {
-            alert('Game has terminated');
-          }
-        };
-
-        this.gameState.nextStateChange().then(next);
+        });
       }),
       updateCellHighlights() {
         var data = this._activeCell ? [this._activeCell] : [];
