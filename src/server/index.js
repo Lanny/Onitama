@@ -10,11 +10,12 @@ requirejs.config({
   }
 });
 
-function wrap(express, http, socketIo, path, pug, GameSession, ApplicationError) {
+function wrap(process, express, http, socketIo, path, pug, GameSession, ApplicationError) {
   const app = express(),
     server = http.Server(app),
     io = socketIo(server),
-    templateCache = {};
+    templateCache = {},
+    PORT = process.env.PORT || 3000;
 
   function getTemplate(name) {
     var templatePath = path.join(__dirname, '../assets/pug', name);
@@ -102,12 +103,13 @@ function wrap(express, http, socketIo, path, pug, GameSession, ApplicationError)
     });
   });
 
-  server.listen(3000, function () {
-    console.log('Listening on port 3000');
+  server.listen(PORT, function () {
+    console.log(`Listening on port ${PORT}`);
   });
 }
 
 requirejs([
+  'process',
   'express',
   'http',
   'socket.io',
