@@ -1,0 +1,23 @@
+doctype html
+html
+  head
+    title Onitama
+    link(href="/static/css/style.css", rel="stylesheet")
+  body
+    h1 Onitama
+    table
+      thead
+        tr
+          td Game
+          td Last Action
+          td State
+          td Spectators
+          td
+      tbody#game-table
+        tr.loading
+          td(colspan="5") Loading
+
+    a(href="/create-game")
+      Create New Game
+
+    script(src="/static/js/require.js", data-main="/static/js/lobby")

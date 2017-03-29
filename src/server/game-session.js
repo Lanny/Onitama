@@ -91,7 +91,7 @@
         }
       },
       getSpectators() {
-        return Math.min(this.observers.length - 2, 0);
+        return Math.max(this.observers.length - 2, 0);
       },
       getState() {
         if (!this.gameState.started) {
