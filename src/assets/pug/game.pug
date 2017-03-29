@@ -2,27 +2,7 @@ doctype html
 html
   head
     title Onitama
-    style.
-      #game-log {
-        list-style: none;
-        border: 1px solid black;
-        border-radius: 5px;
-        height: 7em;
-        padding: 0;
-        overflow: hidden;
-        overflow-y: scroll;
-      }
-      #game-log > li.log-message {
-        border-bottom: 1px solid #EEE;
-        padding: 2px 5px;
-        font-family: sans-serif;
-      }
-      #game-log > li.log-message:nth-child(even) {
-        background: #F9F9F9;
-      }
-      #game-log > li.log-message:nth-child(odd) {
-        background: #FFF;
-      }
+    link(href="/static/css/style.css", rel="stylesheet")
   body
     svg#game-board
     ul#game-log
