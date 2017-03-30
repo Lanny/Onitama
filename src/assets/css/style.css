@@ -1,3 +1,13 @@
+.game-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-container #game-board {
+  flex: 1;
+}
+
 #game-log {
   list-style: none;
   border: 1px solid black;

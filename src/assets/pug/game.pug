@@ -4,8 +4,9 @@ html
     title Onitama
     link(href="/static/css/style.css", rel="stylesheet")
   body
-    svg#game-board
-    ul#game-log
+    .game-container
+      svg#game-board
+      ul#game-log
     script.
       window.onifig = {
         gameSessionId: "#{session.id}"
