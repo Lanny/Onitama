@@ -7,6 +7,7 @@
       this.observers = [];
       this.id = uuid();
       this.gameState = new game.GameState().initialize();
+      this._stateChangeHandlers = [];
     }
 
     GameSession.prototype = {
@@ -29,6 +30,7 @@
         this.publish('participantDisconnected', {
           color: observer.color
         });
+        this._changeState();
       },
       acceptParticipant(socket) {
         var color, participant;
@@ -58,6 +60,8 @@
           this.gameState.start();
           this.publish('gameStarted', {});
         }
+
+        this._changeState();
 
         return participant;
       },
@@ -90,12 +94,22 @@
           this.broadcast(participant, 'moveMade', move);
         }
       },
+      onStateChange(callback) {
+        this._stateChangeHandlers.push(callback);
+      },
+      _changeState(info) {
+        this._stateChangeHandlers.forEach(cb => cb(info));
+      },
       getSpectators() {
         return Math.max(this.observers.length - 2, 0);
       },
       getState() {
         if (!this.gameState.started) {
-          return 'awaiting players';
+          if (!(this.white) && !(this.black)) {
+            return 'awaiting two more players';
+          } else {
+            return 'awaiting one more player';
+          }
         } else {
           return 'in progresss';
         }

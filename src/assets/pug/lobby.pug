@@ -4,12 +4,11 @@ html
     title Onitama
     link(href="/static/css/style.css", rel="stylesheet")
   body
-    h1 Onitama
+    h1 ONITAMA
 
-    a(href="/create-game")
-      Create New Game
+    a.new-game(href="/create-game") New Game
 
-    table
+    table#game-table
       thead
         tr
           td Game
@@ -17,7 +16,7 @@ html
           td State
           td Spectators
           td
-      tbody#game-table
+      tbody
         tr.loading
           td(colspan="5") Loading
 

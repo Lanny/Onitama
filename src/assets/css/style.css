@@ -22,3 +22,35 @@
   background: #FFF;
 }
 
+body {
+  font-family: sans-serif;
+}
+
+h1 {
+  text-shadow: 0px 1px 1px #4D4D4D;
+  font-family: Helvetica, sans-serif;
+  color: #222;
+}
+
+.new-game {
+  float: right;
+  padding: 10px 15px;
+  border: 1px solid black;
+  border-radius: 5px;
+  text-decoration: none;
+  color: black;
+}
+
+#game-table {
+  border-spacing: 0;
+  width: 100%;
+}
+
+#game-table td {
+  border-bottom: 1px solid #DDD;
+  padding: 3px 10px;
+}
+
+#game-table .game-row:nth-child(odd) > td {
+  background-color: #F3F3F3;
+}

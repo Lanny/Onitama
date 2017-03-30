@@ -25,7 +25,11 @@
             el.append('td').text('N/A');
             el.append('td').text(data.state);
             el.append('td').text(data.spectators);
-            el.append('td').text('CTA!');
+            el.append('td')
+              .append('a')
+              .text('Join')
+              .classed('join-game', true)
+              .attr('href', `/game/${data.id}`);
           }))
     });
 
