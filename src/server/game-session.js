@@ -8,9 +8,28 @@
       this.id = uuid();
       this.gameState = new game.GameState().initialize();
       this._stateChangeHandlers = [];
+
+      this.joinTime = 60 * 5;
+      this.moveTime = 60 * 10;
+      this.terminationProcess = null;
+      this.lastActionAt = Date.now();
+      this.terminatedAt = null;
+
+      this.bumpMoveTimer();
     }
 
     GameSession.prototype = {
+      bumpMoveTimer() {
+        if (this.terminationProcess) {
+          clearTimeout(this.terminationProcess);
+        }
+
+        this.lastActionAt = Date.now();
+
+        this.terminationProcess = setTimeout(() => {
+          this.terminate();
+        }, (this.gameState.started?this.moveTime:this.joinTime) * 1000);
+      },
       publish(eventName, event) {
         this.broadcast(null, eventName, event);
       },
@@ -61,6 +80,7 @@
           this.publish('gameStarted', {});
         }
 
+        this.bumpMoveTimer();
         this._changeState();
 
         return participant;
@@ -90,6 +110,7 @@
             move.targetPosition,
             card);
 
+          this.bumpMoveTimer();
           participant.emit('moveAccepted', move);
           this.broadcast(participant, 'moveMade', move);
         }
@@ -104,7 +125,13 @@
         return Math.max(this.observers.length - 2, 0);
       },
       getState() {
-        if (!this.gameState.started) {
+        if (this.terminatedAt !== null) {
+          if (this.gameState.winner) {
+            return `done, ${ winner } won`;
+          } else {
+            return 'abandoned';
+          }
+        } else if (!this.gameState.started) {
           if (!(this.white) && !(this.black)) {
             return 'awaiting two more players';
           } else {
@@ -113,6 +140,16 @@
         } else {
           return 'in progresss';
         }
+      },
+      terminate(reason='NOT_GIVEN') {
+        this.gameState.terminate();
+        this.terminatedAt = Date.now();
+        this.observers.forEach(observer =>
+          observer.emit('gameTerminated', { reason }));
+        this._changeState();
+      },
+      lastCall() {
+        this.observers.forEach(observer => observer.socket.disconnect());
       }
     };
 

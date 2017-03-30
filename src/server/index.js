@@ -17,7 +17,11 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
     lobbyNS = io.of('/sockets/lobby'),
     gameNS = io.of('/sockets/game'),
     templateCache = {},
-    PORT = process.env.PORT || 3000;
+    PORT = process.env.PORT || 3000,
+    RETENTION_TIME = process.env.RETENTION_TIME || 60,
+    POLL_FREQUENCY = process.env.POLL_FREQUENCY || 60;
+
+  app.locals.gameSessions = {};
 
   function getTemplate(name) {
     var templatePath = path.join(__dirname, '../assets/pug', name);
@@ -28,38 +32,6 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
 
     return templateCache[templatePath];
   }
-
-  app.locals.gameSessions = {};
-
-  app.use('/static', express.static(path.join(__dirname, '../../build/static')));
-
-  app.get('/', function(req, res) {
-    const response = getTemplate('lobby.pug')();
-    res.send(response);
-  });
-  
-  app.get('/create-game', function(req, res) {
-    const gameSession = new GameSession();
-    app.locals.gameSessions[gameSession.id] = gameSession;
-
-    lobbyNS.emit('gameList', { games: serializeGameList() });
-    gameSession.onStateChange(() => 
-      lobbyNS.emit('gameList', { games: serializeGameList() }));
-
-    res.redirect(`/game/${gameSession.id}`);
-  });
-
-  app.get('/game/:id', function(req, res) {
-    const session = app.locals.gameSessions[req.params.id];
-
-    if (session === undefined) {
-      res.status(404).send('No such game');
-      return;
-    }
-
-    const response = getTemplate('game.pug')({ session });
-    res.send(response);
-  });
 
   function serializeGameList() {
     const games = [];
@@ -75,6 +47,39 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
 
     return games;
   }
+
+  function updateGameList() {
+    lobbyNS.emit('gameList', { games: serializeGameList() });
+  }
+
+  app.use('/static', express.static(path.join(__dirname, '../../build/static')));
+
+  app.get('/', function(req, res) {
+    const response = getTemplate('lobby.pug')();
+    res.send(response);
+  });
+  
+  app.get('/create-game', function(req, res) {
+    const gameSession = new GameSession();
+    app.locals.gameSessions[gameSession.id] = gameSession;
+
+    updateGameList();
+    gameSession.onStateChange(() => updateGameList());
+
+    res.redirect(`/game/${gameSession.id}`);
+  });
+
+  app.get('/game/:id', function(req, res) {
+    const session = app.locals.gameSessions[req.params.id];
+
+    if (session === undefined) {
+      res.status(404).send('No such game');
+      return;
+    }
+
+    const response = getTemplate('game.pug')({ session });
+    res.send(response);
+  });
 
   lobbyNS.on('connection', function(socket) {
     socket.on('requestGameList', function() {
@@ -132,6 +137,31 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
   });
 
   server.listen(PORT, function () {
+    // Poll for inactive games
+    setInterval(function() {
+      var session,
+        somethingChanged = false;
+
+      console.log('Sweeping for inactive game sessions.');
+
+      for (let key in app.locals.gameSessions) {
+        session = app.locals.gameSessions[key];
+
+        if (session.terminatedAt &&
+            Date.now() - session.terminatedAt > RETENTION_TIME * 1000) {
+          console.log(`Game session ${session.id} inactive, removing.`);
+          session.lastCall();
+          delete app.locals.gameSessions[key];
+          somethingChanged = true;
+        }
+      }
+
+      if (somethingChanged) {
+        console.log('Issuing updated game list after update');
+        updateGameList();
+      }
+    }, POLL_FREQUENCY * 1000);
+
     console.log(`Listening on port ${PORT}`);
   });
 }

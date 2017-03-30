@@ -69,6 +69,9 @@
       this.board = null;
       this.deck = null;
       this.started = null;
+      this.winner = null;
+      this.terminated = null;
+
       this._nextStateResolve = null;
       this._nextStatePromise = new Promise(
         (resolve,_) => this._nextStateResolve = resolve);
@@ -269,7 +272,10 @@
 
         next();
       },
-      serialize: function() {
+      terminate() {
+        this.terminated = true;
+      },
+      serialize() {
         const serializeCell = c => (c === null) ? null : c.serialize()
         return {
           board: this.board.map(row => row.map(serializeCell)),

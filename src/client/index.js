@@ -63,6 +63,15 @@
         card);
     });
 
+    socket.on('gameTerminated', function(msg) {
+      gameState.terminate();
+      logger.info(`Game concluded because ${ msg.reason }`);
+    });
+
+    socket.on('disconnect', function(msg) {
+      logger.info('Disconnected...');
+    });
+
     socket.on('applicationError', function(msg) {
       logger.error('Application error!' + msg);
     });
