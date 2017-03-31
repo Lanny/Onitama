@@ -180,6 +180,35 @@
           targetPosition: targetPosition,
           card
         });
+
+        // Check for victory
+        const masters = this.getPieces()
+          .filter(piece => piece.piece.getType() === 'MASTER');
+
+        if (masters.length === 1) {
+          // A master has been captured
+          this.winner = masters[0].piece.getColor();
+        }
+
+        for (let i=0; i<masters.length; i++) {
+          const {piece: master, x, y} = masters[i],
+            [vx, vy] = (master.getColor() === 'WHITE') ? [2,4] : [2,0];
+
+          if (x === vx && y === vy) {
+            // A master has made it to the opposing side
+            this.winner = master.getColor();
+            break;
+          }
+        }
+
+        if (this.winner !== null) {
+          alert('Yo! Someone won! DOPE!');
+          this._executeStateChange({
+            type: 'VICTORY',
+            winner: this.winner
+          });
+        }
+
       },
       getPieces() {
         var pieces = [];
