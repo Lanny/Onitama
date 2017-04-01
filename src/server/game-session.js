@@ -127,7 +127,7 @@
       getState() {
         if (this.terminatedAt !== null) {
           if (this.gameState.winner) {
-            return `done, ${ winner } won`;
+            return `done, ${ this.gameState.winner } won`;
           } else {
             return 'abandoned';
           }
