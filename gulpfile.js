@@ -6,7 +6,8 @@ var argv = require('yargs').argv;
 
 var jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
   svgFiles = ['src/assets/svg/*.svg'],
-  cssFiles = ['src/assets/css/*.css'];
+  cssFiles = ['src/assets/css/*.css'],
+  mp3Files = ['src/assets/mp3/*.mp3'];
 
 gulp.task('clean', function() {
   return del('build');
@@ -22,6 +23,11 @@ gulp.task('js', function() {
   return pipeLine.pipe(gulp.dest('build/static/js'));
 });
 
+gulp.task('mp3', function() {
+  return gulp.src(mp3Files)
+    .pipe(gulp.dest('build/static/mp3'));
+});
+
 gulp.task('svg', function() {
   return gulp.src(svgFiles)
     .pipe(gulp.dest('build/static/svg'));
@@ -32,7 +38,7 @@ gulp.task('css', function() {
     .pipe(gulp.dest('build/static/css'));
 });
 
-gulp.task('generate', ['js', 'svg', 'css'], function() { });
+gulp.task('generate', ['js', 'svg', 'css', 'mp3'], function() { });
 
 gulp.task('server', ['generate'], function() {
   gulp.watch(jsFiles, ['js']);

@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap(d3, game, utils, {WHITE, BLACK}, {rectify}) {
+  function wrap(d3, game, AudioManager, utils, {WHITE, BLACK}, {rectify}) {
     const cardSlots = {
       'BLACK0': [5, 0],
       'BLACK1': [55, 0],
@@ -133,6 +133,7 @@
       this.svg = d3.select(svg);
       this.socket = socket;
       this.logger = logger;
+      this.audioManager = new AudioManager();
 
       this.cardPromptActive = false;
       this.moveIndicators = [];
@@ -328,6 +329,10 @@
       },
       watchStateChange: (function() {
         this.gameState.onStateChange(info => {
+          if (info.type === 'TURN') {
+            this.audioManager.playMoveSound();
+          }
+
           this.renderPieces();
           this.renderCards();
         });
@@ -399,6 +404,7 @@
   define([
     'd3',
     'game',
+    'audio-manager',
     'utils',
     'colors',
     'client-utils'
