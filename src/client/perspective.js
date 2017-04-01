@@ -269,7 +269,8 @@
         });
       },
       attemptSettingActiveCell(x, y) {
-        if (this.gameState.started === false) {
+        if (this.gameState.started === false ||
+            this.gameState.winner !== null) {
           return false;
         }
 

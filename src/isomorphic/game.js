@@ -123,6 +123,13 @@
           };
         }
 
+        if (this.winner !== null) {
+          return {
+            valid: false,
+            reason: 'The game is over, no further moves allowed.'
+          };
+        }
+
         if (piece === null || piece.getColor() !== this.currentTurn) {
           return {
             valid: false,
@@ -202,7 +209,6 @@
         }
 
         if (this.winner !== null) {
-          alert('Yo! Someone won! DOPE!');
           this._executeStateChange({
             type: 'VICTORY',
             winner: this.winner
