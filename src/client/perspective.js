@@ -163,8 +163,16 @@
       this.cardPromptGroup = this.svg.append('g')
         .classed('card-prompt', true);
 
+      this.statusLine = this.svg.append('text')
+        .classed('status-line', true)
+        .attr('x', 145)
+        .attr('y', 2)
+        .attr('font-size', 3)
+        .attr('text-anchor', 'end');
+
       this.renderPieces();
       this.renderCards();
+      this.renderStatusLine();
 
       this.watchStateChange();
     }
@@ -335,6 +343,7 @@
 
           this.renderPieces();
           this.renderCards();
+          this.renderStatusLine();
         });
       }),
       updateCellHighlights() {
@@ -395,6 +404,23 @@
             .scale(0.16)
             .translate(...getCardCoords(d.hand, this.color))
             .fmt()));
+      },
+      renderStatusLine() {
+        var statusText;
+        if (!this.gameState.started) {
+          statusText = 'Waiting for players';
+        } else if (!!this.gameState.winner) {
+          statusText = `${utils.niceName(this.gameState.winner)} has won the game`;
+        } else {
+          const curPlayer = utils.niceName(this.gameState.currentTurn);
+          if (this.gameState.currentTurn === this.color) {
+            statusText = `${curPlayer} (you) to move`;
+          } else {
+            statusText = `${curPlayer} to move`;
+          }
+        }
+
+        this.statusLine.text(statusText);
       }
     };
 
