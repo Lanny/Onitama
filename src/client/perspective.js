@@ -280,7 +280,7 @@
       },
       attemptSettingActiveCell(x, y) {
         if (this.gameState.started === false ||
-            this.gameState.winner !== null) {
+            this.gameState.terminated) {
           return false;
         }
 
@@ -348,7 +348,7 @@
 
           if (this.gameState.currentTurn === this.color &&
               this.gameState.started === true &&
-              this.gameState.winner === null) {
+              this.gameState.terminated !== false) {
             document.title = pageTitle + ' *';
           } else {
             document.title = pageTitle;

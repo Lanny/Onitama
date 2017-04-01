@@ -209,6 +209,7 @@
         }
 
         if (this.winner !== null) {
+          this.terminated = true;
           this._executeStateChange({
             type: 'VICTORY',
             winner: this.winner
@@ -316,7 +317,9 @@
           board: this.board.map(row => row.map(serializeCell)),
           deck: this.deck.map(card => card.serialize()),
           currentTurn: this.currentTurn,
-          started: this.started
+          started: this.started,
+          winner: this.winner,
+          terminated: this.terminated
         };
       },
       loadState(state) {
@@ -335,6 +338,8 @@
         this.deck = state.deck.map(cards.loadCard);
         this.currentTurn = state.currentTurn;
         this.started = state.started;
+        this.winner = state.winner;
+        this.terminated = state.terminated;
 
         return this;
       }

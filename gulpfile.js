@@ -48,6 +48,10 @@ gulp.task('server', ['generate'], function() {
   return nodemon({
     script: 'src/server/index.js',
     ext: 'js,pug',
-    watch: ['src/server/', 'src/assets/pug/']
+    watch: [
+      'src/server/',
+      'src/isomorphic/',
+      'src/assets/pug/'
+    ]
   });
 });
