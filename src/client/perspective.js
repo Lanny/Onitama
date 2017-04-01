@@ -1,12 +1,13 @@
 ;(function() {
   function wrap(d3, game, AudioManager, utils, {WHITE, BLACK}, {rectify}) {
     const cardSlots = {
-      'BLACK0': [5, 0],
-      'BLACK1': [55, 0],
-      'WHITE0': [5, 130],
-      'WHITE1': [55, 130],
-      'TRANSFER': [105, 65]
-    };
+        'BLACK0': [5, 0],
+        'BLACK1': [55, 0],
+        'WHITE0': [5, 130],
+        'WHITE1': [55, 130],
+        'TRANSFER': [105, 65]
+      },
+      pageTitle = document.title;
 
     function getCardCoords(position, perspective) {
       if (position === 'TRANSFER') {
@@ -344,6 +345,14 @@
           this.renderPieces();
           this.renderCards();
           this.renderStatusLine();
+
+          if (this.gameState.currentTurn === this.color &&
+              this.gameState.started === true &&
+              this.gameState.winner === null) {
+            document.title = pageTitle + ' *';
+          } else {
+            document.title = pageTitle;
+          }
         });
       }),
       updateCellHighlights() {
