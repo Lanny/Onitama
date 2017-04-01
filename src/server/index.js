@@ -17,6 +17,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
     lobbyNS = io.of('/sockets/lobby'),
     gameNS = io.of('/sockets/game'),
     templateCache = {},
+    GA_UA = process.env.GA_UA || null,
     PORT = process.env.PORT || 3000,
     RETENTION_TIME = process.env.RETENTION_TIME || 60,
     POLL_FREQUENCY = process.env.POLL_FREQUENCY || 60;
@@ -55,7 +56,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
   app.use('/static', express.static(path.join(__dirname, '../../build/static')));
 
   app.get('/', function(req, res) {
-    const response = getTemplate('lobby.pug')();
+    const response = getTemplate('lobby.pug')({ ga_ua: GA_UA });
     res.send(response);
   });
   
@@ -77,7 +78,10 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
       return;
     }
 
-    const response = getTemplate('game.pug')({ session });
+    const response = getTemplate('game.pug')({
+      session,
+      ga_ua: GA_UA
+    });
     res.send(response);
   });
 

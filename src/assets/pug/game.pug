@@ -1,15 +1,11 @@
-doctype html
-html
-  head
-    title Onitama
-    link(href="/static/css/style.css", rel="stylesheet")
-  body
-    .game-container
-      svg#game-board
-      ul#game-log
-    script.
-      window.onifig = {
-        gameSessionId: "#{session.id}"
-      };
+extends base
+block content
+  .game-container
+    svg#game-board
+    ul#game-log
+  script.
+    window.onifig = {
+      gameSessionId: "#{session.id}"
+    };
 
-    script(src="/static/js/require.js", data-main="/static/js/index")
+  script(src="/static/js/require.js", data-main="/static/js/index")
