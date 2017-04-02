@@ -17,6 +17,13 @@
           hand: this.hand,
           type: 'SIMPLE'
         };
+      },
+      getColor() {
+        if (this.hand === 'TRANSFER') {
+          return null;
+        }
+
+        return this.hand.substring(0,5);
       }
     };
 

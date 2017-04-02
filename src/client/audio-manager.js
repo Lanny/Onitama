@@ -36,8 +36,10 @@
           }
 
           setTimeout(() => {
-            console.warn(`Only ${numLoaded} of ${sounds.length} audio files loaded after timeout out ${LOAD_TIMEOUT} seconds. AudioManager loading failed.`);
-            reject(this);
+            if (numLoaded !== sounds.length) {
+              console.warn(`Only ${numLoaded} of ${sounds.length} audio files loaded after timeout out ${LOAD_TIMEOUT} seconds. AudioManager loading failed.`);
+              reject(this);
+            }
           }, LOAD_TIMEOUT * 1000);
         });
       },

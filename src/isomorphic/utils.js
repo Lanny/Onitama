@@ -22,10 +22,11 @@
           A[5] + B[5]
         ]);
       },
-      translate(x, y) {
+      translate(x, y, local=true) {
         var newData = this._data.slice();
-        newData[4] += x;
-        newData[5] += y;
+
+        newData[4] = this._data[0] * x + this._data[2] * y + this._data[4];
+        newData[5] = this._data[1] * x + this._data[3] * y + this._data[5];
 
         return new Matrix(newData);
       },

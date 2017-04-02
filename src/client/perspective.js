@@ -1,11 +1,20 @@
 ;(function() {
   function wrap(d3, game, AudioManager, utils, {WHITE, BLACK}, {rectify}) {
-    const cardSlots = {
-        'BLACK0': [5, 0],
-        'BLACK1': [55, 0],
-        'WHITE0': [5, 130],
-        'WHITE1': [55, 130],
-        'TRANSFER': [105, 65]
+    function centerN(n, size, over) {
+      const remainder = over - n * size,
+        gap = remainder / (n+1);
+
+      return d3.range(n)
+        .map(x => x * (size +  gap) + gap + size / 2);
+    }
+
+    const [CARD_X1, CARD_X2] = centerN(2, 250*0.16, 100),
+      cardSlots = {
+        'BLACK0': [CARD_X1, 10],
+        'BLACK1': [CARD_X2, 10],
+        'WHITE0': [CARD_X1, 140],
+        'WHITE1': [CARD_X2, 140],
+        'TRANSFER': [125, 75]
       },
       pageTitle = document.title;
 
@@ -14,7 +23,7 @@
         return cardSlots[position];
       }
 
-      var b = (perspective === WHITE) ? 0 : 130,
+      var b = (perspective === WHITE) ? 0 : 150,
         m = (perspective === WHITE) ? 1 : -1;
 
       return [
@@ -79,10 +88,9 @@
     }
 
     function rectifyCard(g, card) {
-      var border = 12.5;
+      const border = 12.5;
 
-      g.classed('card', true)
-        .attr('transform', 'scale(0.16)');
+      g.classed('card', true);
 
       rectify(g, 'rect.background', [card],
         selection => selection
@@ -408,11 +416,21 @@
       renderCards() {
         rectify(this.cardsGroup, 'g.card', this.gameState.deck,
           selection => selection
-          .each((card, i, nodes) => rectifyCard(d3.select(nodes[i]), card))
-          .attr('transform', d => (new utils.Matrix())
-            .scale(0.16)
-            .translate(...getCardCoords(d.hand, this.color))
-            .fmt()));
+          .each((card, i, nodes) => 
+            rectifyCard(d3.select(nodes[i]), card))
+          .attr('transform', card => {
+            const topSide = (this.color===WHITE)?BLACK:WHITE;
+              flipped = (card.hand === 'TRANSFER') ?
+                this.gameState.currentTurn === topSide :
+                card.getColor()===topSide;
+
+            return (new utils.Matrix())
+              .translate(...getCardCoords(card.hand, this.color))
+              .rotate(flipped ? Math.PI : 0)
+              .scale(0.16)
+              .translate(-250/2, -125/2)
+              .fmt();
+          }));
       },
       renderStatusLine() {
         var statusText;
