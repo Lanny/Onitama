@@ -217,9 +217,9 @@
                 tsy = this._gridYToSvgY(d.targetPosition[1]);
 
               return (new utils.Matrix())
+                .translate(isx, isy)
                 .rotate(Math.atan2(tsy-isy, tsx-isx))
                 .scale(20)
-                .translate(isx, isy)
                 .fmt();
               })
               .attr('stroke', d => (d.color===WHITE)?'black':'white')
@@ -277,8 +277,8 @@
             selection => selection
               .each((card, i, nodes) => rectifyCard(d3.select(nodes[i]), card))
               .attr('transform', (d, i) => (new utils.Matrix())
-                .scale(0.2)
                 .translate(16 + (i*67), 62.5)
+                .scale(0.2)
                 .fmt())
               .on('click', d => {
                 cleanup();
