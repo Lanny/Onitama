@@ -9,8 +9,8 @@
       this.gameState = new game.GameState().initialize();
       this._stateChangeHandlers = [];
 
-      this.joinTime = 60 * 5;
-      this.moveTime = 60 * 10;
+      this.joinTime = 60 * 30;
+      this.moveTime = 60 * 30;
       this.terminationProcess = null;
       this.lastActionAt = Date.now();
       this.terminatedAt = null;
