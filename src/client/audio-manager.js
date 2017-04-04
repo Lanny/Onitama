@@ -47,11 +47,11 @@
         var sound = this._sounds[soundName];
 
         if (!sound) {
-          console.log(this._sounds);
-          throw new Error(`Sound ${soundName} not loaded!`);
+          console.error(`Sound ${soundName} not loaded!`);
+        } else {
+          sound.play();
         }
 
-        sound.play();
         return sound;
       },
       playMoveSound() {
