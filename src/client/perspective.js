@@ -409,7 +409,7 @@
             .classed('piece', true)
             .attr('width', 15)
             .attr('height', 15)
-            .attr('href', d => d.piece.getSvgPath() )
+            .attr('xlink:href', d => d.piece.getSvgPath() )
             .attr('x', d => this._gridXToSvgX(d.x) - 7.2 )
             .attr('y', d => this._gridYToSvgY(d.y) - 7.5 ));
       },
