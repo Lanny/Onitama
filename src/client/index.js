@@ -91,14 +91,21 @@
         return;
       }
 
+      const name = d3.select('#name').node().value;
       logger.info('Joining game...');
+
       socket.emit('requestRole', {
         gameSessionId: window.onifig.gameSessionId,
-        name: d3.select('#name').node().value
+        name: name
       });
 
+      window.sessionStorage.lastUserName = name;
       roleRequested = true;
     });
+
+    if (window.sessionStorage.lastUserName) {
+      d3.select('#name').node().value = window.sessionStorage.lastUserName;
+    }
   });
 
 })();
