@@ -14,6 +14,9 @@
       logMove(message, move) {
         this.logMessage('MOVE', sentenceCase(message), move);
       },
+      logChat(msg) {
+        this.logMessage('INFO', msg.message)
+      },
       info(message) {
         this.logMessage('INFO', sentenceCase(message));
       },

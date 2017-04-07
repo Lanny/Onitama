@@ -11,11 +11,13 @@
     'perspective',
     'cards',
     'logger',
+    'chat',
     'utils',
     'colors'
-  ], function(io, game, Perspective, cards, Logger, utils, {WHITE, BLACK}) {
+  ], function(io, game, Perspective, cards, Logger, Chat, utils, {WHITE, BLACK}) {
     const socket = io.connect('/sockets/game'),
-      logger = new Logger(document.getElementById('game-log'));
+      logger = new Logger(document.getElementById('log-lines')),
+      chat = new Chat(document.getElementById('chat-box'), socket, logger);
     var gameState;
 
     socket.on('->assignRole', function(msg) {

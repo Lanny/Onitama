@@ -115,6 +115,11 @@
           this.broadcast(participant, 'moveMade', move);
         }
       },
+      submitChatMessage(sender, message) {
+        this.publish('chatMessage', {
+          message: message
+        });
+      },
       onStateChange(callback) {
         this._stateChangeHandlers.push(callback);
       },

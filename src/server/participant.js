@@ -3,9 +3,15 @@ function wrap() {
     this.socket = socket;
     this.session = session;
     this.color = color;
+
+    this.init();
   }
 
   Participant.prototype = {
+    init() {
+      this.socket.on('->submitChatMessage', msg => 
+        this.session.submitChatMessage(this, msg.message));
+    },
     assignRole() {
       this.emit('->assignRole', {
         color: this.color,

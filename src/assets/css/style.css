@@ -2,38 +2,53 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
 .game-container #game-board {
   flex: 1;
 }
 
-#game-log {
-  list-style: none;
+.game-log {
   border: 1px solid black;
   border-radius: 5px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.game-log #log-lines {
+  list-style: none;
   height: 7em;
   padding: 0;
   overflow: hidden;
   overflow-y: scroll;
 }
 
-#game-log > li.log-message {
+
+.game-log #log-lines > li.log-message {
   border-bottom: 1px solid #EEE;
   padding: 2px 5px;
   font-family: sans-serif;
 }
 
-#game-log > li.log-message:nth-child(even) {
+.game-log #log-lines > li.log-message:nth-child(even) {
   background: #F9F9F9;
 }
 
-#game-log > li.log-message:nth-child(odd) {
+.game-log #log-lines > li.log-message:nth-child(odd) {
   background: #FFF;
+}
+
+.game-log #chat-box {
+  border: none;
+  border-top: 1px solid black;
+  width: 100%;
 }
 
 body {
   font-family: sans-serif;
+  margin: 0;
 }
 
 h1 {

@@ -2,7 +2,9 @@ extends base
 block content
   .game-container
     svg#game-board(xmlns:xlink="http://www.w3.org/1999/xlink")
-    ul#game-log
+    .game-log
+      ul#log-lines
+      input#chat-box(type="text")
   script.
     window.onifig = {
       gameSessionId: "#{session.id}"
