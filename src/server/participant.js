@@ -1,35 +1,41 @@
-function wrap() {
-  function Participant(socket, session, color) {
-    this.socket = socket;
-    this.session = session;
-    this.color = color;
+;(function() {
+  function wrap(uuid) {
+    function Participant(socket, session, name, color) {
+      this.socket = socket;
+      this.session = session;
+      this.color = color;
+      this.id = uuid();
+      this.name = name;
 
-    this.init();
-  }
-
-  Participant.prototype = {
-    init() {
-      this.socket.on('->submitChatMessage', msg => 
-        this.session.submitChatMessage(this, msg.message));
-    },
-    assignRole() {
-      this.emit('->assignRole', {
-        color: this.color,
-        gameState: this.session.gameState.serialize()
-      });
-    },
-    emit(...args) {
-      this.socket.emit(...args);
-    },
-    on(...args) {
-      this.socket.on(...args);
-    },
-    isConnected() {
-      return true;
+      this.init();
     }
+
+    Participant.prototype = {
+      init() {
+        this.socket.on('->submitChatMessage', msg => 
+          this.session.submitChatMessage(this, msg.message));
+      },
+      assignRole() {
+        this.emit('->assignRole', {
+          color: this.color,
+          gameState: this.session.gameState.serialize()
+        });
+      },
+      emit(...args) {
+        this.socket.emit(...args);
+      },
+      on(...args) {
+        this.socket.on(...args);
+      },
+      isConnected() {
+        return true;
+      }
+    }
+
+    return Participant;
   }
 
-  return Participant;
-}
-
-define([], wrap);
+  define([
+   'uuid'
+  ], wrap);
+})();

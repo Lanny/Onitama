@@ -15,7 +15,7 @@
         this.logMessage('MOVE', sentenceCase(message), move);
       },
       logChat(msg) {
-        this.logMessage('INFO', msg.message)
+        this.logMessage('INFO', `${ msg.senderName }: ${msg.message}`);
       },
       info(message) {
         this.logMessage('INFO', sentenceCase(message));

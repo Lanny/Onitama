@@ -126,7 +126,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
           'INVALID_SEQUENCE');
       }
 
-      participant = session.acceptParticipant(socket);
+      participant = session.acceptParticipant(socket, msg.name);
     });
 
     on('->makeMove', function(msg) {

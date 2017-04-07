@@ -51,26 +51,30 @@
         });
         this._changeState();
       },
-      acceptParticipant(socket) {
+      acceptParticipant(socket, name) {
         var color, participant;
 
         if (this.white === null) {
-          participant = new Participant(socket, this, WHITE);
+          participant = new Participant(socket, this, name, WHITE);
           this.white = participant;
           color = WHITE;
         } else if (this.black === null) {
-          participant = new Participant(socket, this, BLACK);
+          participant = new Participant(socket, this, name, BLACK);
           this.black = participant;
           color = BLACK;
         } else {
-          participant = new Participant(socket, this, PARTICIPANT);
+          participant = new Participant(socket, this, name, PARTICIPANT);
           color = PARTICIPANT;
         }
 
         participant.assignRole();
 
         this.observers.push(participant);
-        this.broadcast(participant, 'roleAssigned', { color });
+        this.broadcast(participant, 'roleAssigned', {
+          color: color,
+          id: participant.id,
+          name: name
+        });
 
         participant.on('disconnect',
                        this.handleDisconnect.bind(this, participant));
@@ -117,7 +121,8 @@
       },
       submitChatMessage(sender, message) {
         this.publish('chatMessage', {
-          message: message
+          message: message,
+          senderName: sender.name
         });
       },
       onStateChange(callback) {

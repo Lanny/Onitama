@@ -46,7 +46,7 @@
     });
 
     socket.on('roleAssigned', function(msg) {
-      logger.info(`${ utils.niceName(msg.color) } has joined the game.`);
+      logger.info(`${ msg.name } has joined the game as ${ utils.niceName(msg.color) }.`);
     });
 
     socket.on('gameStarted', function(msg) {
@@ -82,6 +82,7 @@
     socket.on('applicationError', function(msg) {
       logger.error('Application error!' + msg);
     });
+
 
     d3.select('#name-form').on('submit', function() {
       d3.event.preventDefault();
