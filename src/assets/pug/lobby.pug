@@ -1,20 +1,20 @@
 extends base
 block content
-  h1 ONITAMA
+  .lobby
+    h1 ONITAMA
 
-  a.new-game(href="/create-game") New Game
+    a.new-game(href="/create-game") New Game
 
-  table#game-table
-    thead
-      tr
-        td Game
-        td Last Action
-        td State
-        td Spectators
-        td
-    tbody
-      tr.loading
-        td(colspan="5") Loading
-
+    table#game-table
+      thead
+        tr
+          td Game
+          td Last Action
+          td State
+          td Spectators
+          td
+      tbody
+        tr.loading
+          td(colspan="5") Loading
 
   script(src="/static/js/require.js", data-main="/static/js/lobby")

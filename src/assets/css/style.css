@@ -78,7 +78,11 @@ h1 {
   color: #222;
 }
 
-.new-game {
+.lobby {
+  padding: 8px;
+}
+
+.lobby .new-game {
   float: right;
   padding: 10px 15px;
   border: 1px solid black;
@@ -87,16 +91,16 @@ h1 {
   color: black;
 }
 
-#game-table {
+.lobby #game-table {
   border-spacing: 0;
   width: 100%;
 }
 
-#game-table td {
+.lobby #game-table td {
   border-bottom: 1px solid #DDD;
   padding: 3px 10px;
 }
 
-#game-table .game-row:nth-child(odd) > td {
+.lobby #game-table .game-row:nth-child(odd) > td {
   background-color: #F3F3F3;
 }
