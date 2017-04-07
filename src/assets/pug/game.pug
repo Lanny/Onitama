@@ -1,5 +1,11 @@
 extends base
 block content
+  .landing-screen
+      form#name-form
+        h1 Onitama
+        small Joining Game...
+        input#name(type=text, placeholder="Enter your name")
+
   .game-container
     svg#game-board(xmlns:xlink="http://www.w3.org/1999/xlink")
     .game-log

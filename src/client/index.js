@@ -7,6 +7,7 @@
 
   requirejs([
     'socket.io',
+    'd3',
     'game',
     'perspective',
     'cards',
@@ -14,11 +15,12 @@
     'chat',
     'utils',
     'colors'
-  ], function(io, game, Perspective, cards, Logger, Chat, utils, {WHITE, BLACK}) {
+  ], function(io, d3, game, Perspective, cards, Logger, Chat, utils, {WHITE, BLACK}) {
     const socket = io.connect('/sockets/game'),
       logger = new Logger(document.getElementById('log-lines')),
       chat = new Chat(document.getElementById('chat-box'), socket, logger);
-    var gameState;
+    var roleRequested = false,
+      gameState = null;
 
     socket.on('->assignRole', function(msg) {
       gameState = new game.GameState().loadState(msg.gameState);
@@ -28,6 +30,9 @@
 
       logger.setPerspective(perspective);
       logger.info(`Joined game as ${ utils.niceName(msg.color) }.`);
+
+      d3.select('.landing-screen').style('display', 'none');
+      d3.select('.game-container').style('display', 'flex');
     });
 
     socket.on('participantDisconnected', function(msg) {
@@ -78,8 +83,21 @@
       logger.error('Application error!' + msg);
     });
 
-    logger.info('Joining game...');
-    socket.emit('requestRole', { gameSessionId: window.onifig.gameSessionId });
+    d3.select('#name-form').on('submit', function() {
+      d3.event.preventDefault();
+
+      if (roleRequested) {
+        return;
+      }
+
+      logger.info('Joining game...');
+      socket.emit('requestRole', {
+        gameSessionId: window.onifig.gameSessionId,
+        name: d3.select('#name').node().value
+      });
+
+      roleRequested = true;
+    });
   });
 
 })();
