@@ -5,6 +5,7 @@
       this.session = session;
       this.color = color;
       this.id = uuid();
+      this.rejoinCode = uuid();
       this.name = name;
 
       this.init();
@@ -18,6 +19,8 @@
       assignRole() {
         this.emit('->assignRole', {
           color: this.color,
+          rejoinCode: this.rejoinCode,
+          name: this.name,
           gameState: this.session.gameState.serialize()
         });
       },

@@ -14,11 +14,14 @@
     'logger',
     'chat',
     'utils',
+    'storage-manager',
     'colors'
-  ], function(io, d3, game, Perspective, cards, Logger, Chat, utils, {WHITE, BLACK}) {
+  ], function(io, d3, game, Perspective, cards, Logger, Chat, utils, storage, {WHITE, BLACK}) {
     const socket = io.connect('/sockets/game'),
       logger = new Logger(document.getElementById('log-lines')),
-      chat = new Chat(document.getElementById('chat-box'), socket, logger);
+      chat = new Chat(document.getElementById('chat-box'), socket, logger),
+      rejoinKey = 'rejoin-' + window.onifig.gameSessionId;
+
     var roleRequested = false,
       gameState = null;
 
@@ -27,6 +30,8 @@
 
       const svg = document.getElementById('game-board'),
         perspective = new Perspective(gameState, msg.color, svg, socket, logger);
+
+      storage.set(rejoinKey, msg.rejoinCode);
 
       logger.setPerspective(perspective);
       logger.info(`Joined game as ${ utils.niceName(msg.color) }.`);
@@ -99,12 +104,17 @@
         name: name
       });
 
-      window.sessionStorage.lastUserName = name;
+      storage.set('lastUserName', name, 1000*60*60*24*28);
       roleRequested = true;
     });
 
-    if (window.sessionStorage.lastUserName) {
-      d3.select('#name').node().value = window.sessionStorage.lastUserName;
+    const lastUserName = storage.get('lastUserName');
+    if (lastUserName) {
+      d3.select('#name').node().value = lastUserName;
+    }
+
+    const rejoinCode = storage.get(rejoinKey);
+    if (rejoinCode) {
     }
   });
 

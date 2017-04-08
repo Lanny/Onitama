@@ -5,6 +5,7 @@
       this.white = null;
       this.black = null;
       this.observers = [];
+      this.purgatory = [];
       this.id = uuid();
       this.gameState = new game.GameState().initialize();
       this._stateChangeHandlers = [];
@@ -46,8 +47,11 @@
         if (observer === this.black) this.black = null;
         if (observer === this.white) this.white = null;
 
+        this.purgatory.push(observer);
+
         this.publish('participantDisconnected', {
-          color: observer.color
+          color: observer.color,
+          name: observer.name
         });
         this._changeState();
       },
