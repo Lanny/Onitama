@@ -134,6 +134,19 @@
       getSpectators() {
         return Math.max(this.observers.length - 2, 0);
       },
+      _getPlayers() {
+        return [this.white, this.black].filter(p => p);
+      },
+      getName() {
+        const players = this._getPlayers();
+        if (players.length === 0) {
+          return 'A newly created game'
+        } else if (players.length === 1) {
+          return `${ players[0].name } vs. ...`;
+        } else {
+          return `${ players[0].name } vs. ${ players[1].name }`;
+        }
+      },
       getState() {
         if (this.terminatedAt !== null) {
           if (this.gameState.winner) {

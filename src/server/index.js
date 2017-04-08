@@ -40,7 +40,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
       const gameSession = app.locals.gameSessions[gameId];
       games.push({
         id: gameSession.id,
-        name: gameSession.id,
+        name: gameSession.getName(),
         spectators: gameSession.getSpectators(),
         state: gameSession.getState()
       });
