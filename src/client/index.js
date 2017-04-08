@@ -108,6 +108,21 @@
       roleRequested = true;
     });
 
+
+    d3.select('#rejoin-button').on('click', function() {
+      d3.event.preventDefault();
+
+      if (roleRequested) {
+        return;
+      }
+
+      socket.emit('requestRejoin', {
+        gameSessionId: window.onifig.gameSessionId,
+        rejoinCode: rejoinCode
+      });
+      roleRequested = true;
+    });
+
     const lastUserName = storage.get('lastUserName');
     if (lastUserName) {
       d3.select('#name').node().value = lastUserName;
@@ -115,6 +130,7 @@
 
     const rejoinCode = storage.get(rejoinKey);
     if (rejoinCode) {
+      d3.select('.rejoin').style('display', 'block');
     }
   });
 

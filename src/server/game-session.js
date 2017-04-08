@@ -58,7 +58,10 @@
       acceptParticipant(socket, name) {
         var color, participant;
 
-        if (this.white === null) {
+        if (this.gameState.started) {
+          participant = new Participant(socket, this, name, PARTICIPANT);
+          color = PARTICIPANT;
+        } else if (this.white === null) {
           participant = new Participant(socket, this, name, WHITE);
           this.white = participant;
           color = WHITE;
@@ -66,9 +69,6 @@
           participant = new Participant(socket, this, name, BLACK);
           this.black = participant;
           color = BLACK;
-        } else {
-          participant = new Participant(socket, this, name, PARTICIPANT);
-          color = PARTICIPANT;
         }
 
         participant.assignRole();
@@ -92,6 +92,8 @@
         this._changeState();
 
         return participant;
+      },
+      attemptRejoin(socket, rejoinCode) {
       },
       submitMove(move, participant) {
         const piece = this.gameState.getCellContents(...move.initialPosition),

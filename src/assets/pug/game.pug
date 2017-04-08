@@ -6,6 +6,13 @@ block content
         small Joining Game...
         input#name(type=text, placeholder="Enter your name")
 
+        .rejoin
+          span
+            | You appear to have a rejoin code for this room. Click the button
+            | below if you want to rejoin as the player you were previously.
+          button#rejoin-button(type="button") Rejoin
+            
+
   .game-container
     svg#game-board(xmlns:xlink="http://www.w3.org/1999/xlink")
     .game-log
