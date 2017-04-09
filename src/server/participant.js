@@ -32,6 +32,10 @@
       },
       isConnected() {
         return true;
+      },
+      rejoin(socket) {
+        this.socket = socket;
+        this.assignRole();
       }
     }
 

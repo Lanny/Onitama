@@ -111,31 +111,44 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
       });
     }
 
-    on('requestRole', function(msg) {
+    function requireRole() {
+      if (session === null || participant === null) {
+        throw new ApplicationError(
+          'Game session or participant records missing.',
+          'INVALID_SEQUENCE');
+      }
+    }
+
+    function acquireSession(sessionId) {
       if (session !== null) {
         throw new ApplicationError(
-          'requestRole received when role has already been assigned',
+          'role assignment request received when role has already been assigned',
           'INVALID_SEQUENCE');
       }
 
-      session = app.locals.gameSessions[msg.gameSessionId];
+      session = app.locals.gameSessions[sessionId];
 
       if (!session) {
         throw new ApplicationError(
-          `no such game: ${msg.gameSessionId}`,
+          `no such game: ${sessionId}`,
           'INVALID_SEQUENCE');
       }
 
+      return session;
+    }
+
+    on('requestRole', function(msg) {
+      acquireSession(msg.gameSessionId);
       participant = session.acceptParticipant(socket, msg.name);
     });
 
-    on('->makeMove', function(msg) {
-      if (session === null || participant === null) {
-          throw new ApplicationError(
-            'Game session or participant records missing.',
-            'INVALID_SEQUENCE');
-      }
+    on('requestRejoin', function(msg) {
+      acquireSession(msg.gameSessionId);
+      participant = session.attemptRejoin(socket, msg.rejoinCode);
+    });
 
+    on('->makeMove', function(msg) {
+      requireRole();
       session.submitMove(msg, participant);
     });
   });

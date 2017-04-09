@@ -55,6 +55,13 @@
         });
         this._changeState();
       },
+      announceNewParticipant(participant) {
+        this.broadcast(participant, 'roleAssigned', {
+          color: participant.color,
+          id: participant.id,
+          name: participant.name
+        });
+      },
       acceptParticipant(socket, name) {
         var color, participant;
 
@@ -72,13 +79,8 @@
         }
 
         participant.assignRole();
-
         this.observers.push(participant);
-        this.broadcast(participant, 'roleAssigned', {
-          color: color,
-          id: participant.id,
-          name: name
-        });
+        this.announceNewParticipant(participant);
 
         participant.on('disconnect',
                        this.handleDisconnect.bind(this, participant));
@@ -94,6 +96,25 @@
         return participant;
       },
       attemptRejoin(socket, rejoinCode) {
+        const rejoiner = this.purgatory
+          .filter(o => o.rejoinCode === rejoinCode)[0];
+
+        if (rejoiner) {
+          rejoiner.rejoin(socket);
+          if (rejoiner.color === BLACK) {
+            this.black = rejoiner;
+          } else if (rejoiner.color === WHITE) {
+            this.white = rejoiner;
+          }
+
+          this.observers.push(rejoiner);
+          utils.removeFromArray(this.purgatory, rejoiner);
+          this.announceNewParticipant(rejoiner);
+
+          return rejoiner;
+        } else {
+          throw new AppError('Invalid rejoin code.', 'INVALID_REJOIN_CODE');
+        }
       },
       submitMove(move, participant) {
         const piece = this.gameState.getCellContents(...move.initialPosition),
