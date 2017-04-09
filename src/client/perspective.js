@@ -357,7 +357,7 @@
           if (this.gameState.currentTurn === this.color &&
               this.gameState.started === true &&
               this.gameState.terminated !== false) {
-            document.title = pageTitle + ' *';
+            document.title = '* ' + pageTitle;
           } else {
             document.title = pageTitle;
           }
