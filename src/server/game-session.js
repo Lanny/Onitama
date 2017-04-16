@@ -87,6 +87,7 @@
                        this.handleDisconnect.bind(this, participant));
 
         if (!this.gameState.started && this.black && this.white) {
+          this._lockedName = this.getName();
           this.gameState.start();
           this.publish('gameStarted', {});
         }
@@ -167,7 +168,9 @@
       },
       getName() {
         const players = this._getPlayers();
-        if (players.length === 0) {
+        if (this._lockedName) {
+          return this._lockedName;
+        } else if (players.length === 0) {
           return 'A newly created game'
         } else if (players.length === 1) {
           return `${ players[0].name } vs. ...`;

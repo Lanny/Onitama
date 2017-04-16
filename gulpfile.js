@@ -80,9 +80,15 @@ gulp.task('_test', function() {
       'game': '../isomorphic/game',
       'colors': '../isomorphic/colors',
       'cards': '../isomorphic/cards',
-      'utils': '../isomorphic/utils'
+      'utils': '../isomorphic/utils',
+      'mocket': '../test/mocket'
     }
   });
+
+  requirejs.onError = function(err) {
+    console.error('Error encoutered during module loading for test:');
+    console.error(err);
+  };
 
   gulp.src(testFiles)
     .pipe(through.obj(function(file, enc, cb) {
