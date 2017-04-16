@@ -13,8 +13,25 @@
   align-items: center;
 }
 
-.landing-screen #name-form #name {
+.landing-screen #name-form .name-line {
   margin-top: 20px;
+  display: block;
+  border-radius: 5px;
+  overflow: hidden;
+  border: 1px solid lightgrey;
+}
+
+.landing-screen #name-form .name-line #name {
+  border: none;
+  padding: 5px;
+}
+
+.landing-screen #name-form .name-line input[type="submit"] {
+  -webkit-appearance: none;
+  border: none;
+  border-left: 1px solid lightgrey;
+  background-color: white;
+  cursor: pointer;
 }
 
 .landing-screen small {

@@ -4,7 +4,10 @@ block content
       form#name-form
         h1 Onitama
         small Joining Game...
-        input#name(type=text, placeholder="Enter your name")
+
+        .name-line
+          input#name(type=text, disabled=disabled, placeholder="Enter your name")
+          input(type="submit", value="Join")
 
         .rejoin
           span
