@@ -31,6 +31,13 @@
               .classed('join-game', true)
               .attr('href', `/game/${data.id}`);
           }))
+
+      rectify(gameTable, 'tr.no-games-row', msg.games.length?[]:[null],
+        selection => selection
+          .classed('no-games-row', true)
+          .append('td')
+          .attr('colspan', 5)
+          .text('No current games.'));
     });
 
     socket.emit('requestGameList', {});

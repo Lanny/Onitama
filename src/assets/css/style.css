@@ -128,3 +128,8 @@ h1 {
 .lobby #game-table .game-row:nth-child(odd) > td {
   background-color: #F3F3F3;
 }
+
+.lobby #game-table .no-games-row td {
+  text-align: center;
+  padding: 20px;
+}
