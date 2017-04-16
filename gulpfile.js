@@ -8,7 +8,9 @@ var Jasmine = require('jasmine');
 var through = require('through2');
 
 var testFiles = ['src/test/*-spec.js'],
-  jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'].concat(testFiles),
+  clientJsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
+  serverJsFiles = ['src/server/*.js'],
+  allJsFiles = clientJsFiles.concat(serverJsFiles).concat(testFiles),
   svgFiles = ['src/assets/svg/*.svg'],
   cssFiles = ['src/assets/css/*.css'],
   mp3Files = ['src/assets/mp3/*.mp3'];
@@ -18,7 +20,7 @@ gulp.task('clean', function() {
 });
 
 gulp.task('js', function() {
-  var pipeLine = gulp.src(jsFiles);
+  var pipeLine = gulp.src(clientJsFiles);
 
   if (argv.production) {
     pipeLine = pipeLine.pipe(babel({ presets: ['es2015'] }));
@@ -45,7 +47,7 @@ gulp.task('css', function() {
 gulp.task('generate', ['js', 'svg', 'css', 'mp3'], function() { });
 
 gulp.task('server', ['generate'], function() {
-  gulp.watch(jsFiles, ['js']);
+  gulp.watch(clientJsFiles, ['js']);
   gulp.watch(svgFiles, ['svg']);
   gulp.watch(cssFiles, ['css']);
 
@@ -113,7 +115,7 @@ gulp.task('_test', function() {
 });
 
 gulp.task('test:watch', ['_test'], function() {
-  gulp.watch(jsFiles, ['_test']);
+  gulp.watch(allJsFiles, ['_test']);
 });
 
 gulp.task('test:once', ['_test'], function() { });
