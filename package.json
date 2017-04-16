@@ -4,7 +4,7 @@
   "description": "Inspired by (but not affiliated with) the Arcane Wonders board game",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "gulp test:once",
     "start": "node src/server/index.js",
     "postinstall": "gulp generate"
   },
@@ -24,11 +24,13 @@
     "express": "^4.15.2",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
+    "gulp-nodemon": "^2.2.1",
+    "jasmine": "^2.5.3",
     "pug": "^2.0.0-beta11",
     "requirejs": "^2.3.3",
     "socket.io": "^1.7.3",
+    "through2": "^2.0.3",
     "uuid": "^3.0.1",
-    "yargs": "^7.0.2",
-    "gulp-nodemon": "^2.2.1"
+    "yargs": "^7.0.2"
   }
 }

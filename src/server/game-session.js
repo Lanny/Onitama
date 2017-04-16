@@ -9,6 +9,7 @@
       this.id = uuid();
       this.gameState = new game.GameState().initialize();
       this._stateChangeHandlers = [];
+      this._lockedName = null;
 
       this.joinTime = 60 * 30;
       this.moveTime = 60 * 30;

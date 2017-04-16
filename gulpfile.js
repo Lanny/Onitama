@@ -4,7 +4,11 @@ var nodemon = require('gulp-nodemon');
 var babel = require('gulp-babel');
 var argv = require('yargs').argv;
 
-var jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'],
+var Jasmine = require('jasmine');
+var through = require('through2');
+
+var testFiles = ['src/test/*-spec.js'],
+  jsFiles = ['src/client/*.js', 'src/isomorphic/*.js'].concat(testFiles),
   svgFiles = ['src/assets/svg/*.svg'],
   cssFiles = ['src/assets/css/*.css'],
   mp3Files = ['src/assets/mp3/*.mp3'];
@@ -55,3 +59,55 @@ gulp.task('server', ['generate'], function() {
     ]
   });
 });
+
+gulp.task('_test', function() {
+  var jasmine = new Jasmine();
+  var path = require('path');
+  var specs = [];
+  var alreadyCached = {};
+  var moduleName;
+
+  for (moduleName in require.cache) {
+    alreadyCached[moduleName] = null;
+  }
+
+  var requirejs = require('requirejs');
+
+  requirejs.config({
+    nodeRequire: require,
+    baseUrl: path.join(__dirname, 'src/server'),
+    paths: {
+      'game': '../isomorphic/game',
+      'colors': '../isomorphic/colors',
+      'cards': '../isomorphic/cards',
+      'utils': '../isomorphic/utils'
+    }
+  });
+
+  gulp.src(testFiles)
+    .pipe(through.obj(function(file, enc, cb) {
+      specs.push(file.path);
+      cb(null, file);
+    }, function(cb) {
+      requirejs(specs, function() {
+        jasmine.onComplete(function (passed) {
+          cb();
+        });
+
+        jasmine.execute();
+
+        // Clear cache of any modules loaded during test.
+        for (moduleName in require.cache) {
+          if (!(moduleName in alreadyCached)) {
+            delete require.cache[moduleName];
+          }
+        }
+      });
+    }));
+});
+
+gulp.task('test:watch', ['_test'], function() {
+  gulp.watch(jsFiles, ['_test']);
+});
+
+gulp.task('test:once', ['_test'], function() { });
