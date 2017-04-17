@@ -7,6 +7,7 @@
       this.id = uuid();
       this.rejoinCode = uuid();
       this.name = name;
+      this.rematchAccepted = null;
 
       this.init();
     }

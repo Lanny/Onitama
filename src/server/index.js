@@ -10,7 +10,7 @@ requirejs.config({
   }
 });
 
-function wrap(process, express, http, socketIo, path, pug, GameSession, ApplicationError) {
+function wrap(process, express, http, socketIo, path, pug, GameSession, ApplicationError, {WHITE, BLACK}) {
   const app = express(),
     server = http.Server(app),
     io = socketIo(server),
@@ -151,6 +151,35 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
       requireRole();
       session.submitMove(msg, participant);
     });
+
+    on('->proposeRematch', function(msg) {
+      requireRole();
+
+      if (participant.color !== WHITE && participant.color !== BLACK) {
+        throw new ApplicationError('Non-player proposed a rematch. Error.');
+      }
+
+      if (session.black.rematchAccepted && session.white.rematchAccepted) {
+        const gameSession = new GameSession(session);
+        app.locals.gameSessions[gameSession.id] = gameSession; 
+
+        updateGameList();
+        gameSession.onStateChange(() => updateGameList());
+
+        //res.redirect(`/game/${gameSession.id}`);
+
+        session.black.emit('->rematch', {
+        });
+      } else {
+        participant.rematchAccepted = true;
+
+        this.broadcast(participant, 'rematchProposed', {
+          proposerName: participant.name,
+          proposerId: participant.id,
+          proposerColor: participant.color
+        });
+      }
+    });
   });
 
   server.listen(PORT, function () {
@@ -191,5 +220,6 @@ requirejs([
   'path',
   'pug',
   'game-session',
-  'application-error'
+  'application-error',
+  'colors'
 ], wrap);

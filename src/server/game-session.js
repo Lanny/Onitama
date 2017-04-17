@@ -1,21 +1,31 @@
 ;(function() {
   function wrap(uuid, Participant, game, utils, AppError, cards,
                 {WHITE, BLACK, PARTICIPANT}) {
-    function GameSession() {
+    function GameSession(priorSession) {
       this.white = null;
       this.black = null;
+      this.whiteJoinCode = null;
+      this.blackJoinCode = null;
+
       this.observers = [];
       this.purgatory = [];
       this.id = uuid();
       this.gameState = new game.GameState().initialize();
       this._stateChangeHandlers = [];
       this._lockedName = null;
+      this._lastSessionId = null;
 
       this.joinTime = 60 * 30;
       this.moveTime = 60 * 30;
       this.terminationProcess = null;
       this.lastActionAt = Date.now();
       this.terminatedAt = null;
+
+      if (priorSession) {
+        this._lastSessionId = priorSession.id;
+        this.whiteJoinCode = uuid();
+        this.blackJoinCode = uuid();
+      }
 
       this.bumpMoveTimer();
     }
@@ -63,20 +73,37 @@
           name: participant.name
         });
       },
-      acceptParticipant(socket, name) {
+      acceptParticipant(socket, name, joinCode) {
         var color, participant;
 
-        if (this.gameState.started) {
-          participant = new Participant(socket, this, name, PARTICIPANT);
-          color = PARTICIPANT;
-        } else if (this.white === null) {
-          participant = new Participant(socket, this, name, WHITE);
-          this.white = participant;
-          color = WHITE;
-        } else if (this.black === null) {
-          participant = new Participant(socket, this, name, BLACK);
-          this.black = participant;
-          color = BLACK;
+        if (this.whiteJoinCode && this.blackJoinCode) {
+          // Join codes exist
+          if (this.whiteJoinCode === joinCode) {
+            participant = new Participant(socket, this, name, WHITE);
+            this.white = participant;
+            color = WHITE;
+          } else if (this.blackJoinCode === joinCode) {
+            participant = new Participant(socket, this, name, BLACK);
+            this.black = participant;
+            color = BLACK;
+          } else {
+            participant = new Participant(socket, this, name, PARTICIPANT);
+            color = PARTICIPANT;
+          }
+        } else {
+          // No join codes exist
+          if (this.gameState.started) {
+            participant = new Participant(socket, this, name, PARTICIPANT);
+            color = PARTICIPANT;
+          } else if (this.white === null) {
+            participant = new Participant(socket, this, name, WHITE);
+            this.white = participant;
+            color = WHITE;
+          } else if (this.black === null) {
+            participant = new Participant(socket, this, name, BLACK);
+            this.black = participant;
+            color = BLACK;
+          }
         }
 
         participant.assignRole();
@@ -116,6 +143,22 @@
           return rejoiner;
         } else {
           throw new AppError('Invalid rejoin code.', 'INVALID_REJOIN_CODE');
+        }
+      },
+      proposeRematch(participant) {
+        if (participant.color !== WHITE && participant.color !== BLACK) {
+          throw new AppError('Non-player proposed a rematch. Error.');
+        }
+
+        if (this.black.rematchAccepted && this.white.rematchAccepted) {
+          this.black.emit('->rematch', {
+          });
+        } else {
+          this.broadcast(participant, 'rematchProposed', {
+            proposerName: participant.name,
+            proposerId: participant.id,
+            proposerColor: participant.color
+          });
         }
       },
       submitMove(move, participant) {
