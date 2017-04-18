@@ -72,9 +72,7 @@
       this.winner = null;
       this.terminated = null;
 
-      this._nextStateResolve = null;
-      this._nextStatePromise = new Promise(
-        (resolve,_) => this._nextStateResolve = resolve);
+      this._stateChangeWatchers = [];
     }
 
     GameState.prototype = {
@@ -100,9 +98,7 @@
         return this;
       },
       _executeStateChange(info) {
-        this._nextStateResolve(info);
-        this._nextStatePromise = new Promise(
-          (resolve,_) => this._nextStateResolve = resolve);
+        this._stateChangeWatchers.forEach(handler => handler(info));
       },
       localizeCard(cardData) {
         const card = this.deck.filter(lc => lc.name === cardData.name)[0];
@@ -294,19 +290,8 @@
           type: 'START'
         });
       },
-      nextStateChange() {
-        return this._nextStatePromise;
-      },
       onStateChange(handler) {
-        const next  = () => {
-          this.nextStateChange()
-            .then(info => {
-              handler(info);
-              next();
-            });
-        }
-
-        next();
+        this._stateChangeWatchers.push(handler);
       },
       terminate() {
         this.terminated = true;

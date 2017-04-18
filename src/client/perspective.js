@@ -137,6 +137,7 @@
     }
 
     function Perspective(gameState, color, svg, socket, logger) {
+      gs = socket;
       this.gameState = gameState;
       this.color = color;
       this.svg = d3.select(svg);
@@ -286,6 +287,42 @@
               }));
         });
       },
+      promptForRematch() {
+        return new Promise((resolve, reject) => {
+          var promptGroup = this.svg.append('g')
+            .classed('rematch-prompt', true)
+            .attr('transform', 'translate(112.5, 90)');
+
+          const rematchButton = promptGroup
+            .append('g')
+            .attr('transform', 'translate(0,3)')
+            .style('cursor', 'pointer')
+            .on('mouseover', () => buttonFrame.attr('fill', 'lightgrey'))
+            .on('mouseout', () => buttonFrame.attr('fill', 'none'))
+            .on('click', () => {
+              promptGroup.remove();
+              resolve();
+            });
+
+          const buttonFrame = rematchButton
+            .append('rect')
+            .attr('width', 25)
+            .attr('height', 7)
+            .attr('fill', 'none')
+            .attr('stroke', 'black')
+            .attr('stroke-width', .5)
+
+          rematchButton
+            .append('text')
+            .text('REMATCH')
+            .attr('x', '12.5')
+            .attr('y', '5')
+            .attr('text-anchor', 'middle')
+            .attr('fill', 'black')
+            .style('font-size', '4px');
+
+        });
+      },
       attemptSettingActiveCell(x, y) {
         if (this.gameState.started === false ||
             this.gameState.terminated) {
@@ -348,6 +385,12 @@
         this.gameState.onStateChange(info => {
           if (info.type === 'TURN') {
             this.audioManager.playMoveSound();
+          } else if (info.type === 'VICTORY' &&
+                     (this.color === WHITE || this.color === BLACK)) {
+            this.promptForRematch()
+              .then(
+                () => this.socket.emit('->proposeRematch', {}),
+                () => null);
           }
 
           this.renderPieces();

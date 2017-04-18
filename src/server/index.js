@@ -159,6 +159,13 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
         throw new ApplicationError('Non-player proposed a rematch. Error.');
       }
 
+      /*
+      if (!session.gameState.terminated) {
+        throw new ApplicationError(
+          'Game isn\'t finished yet, rematch not permitted');
+      }
+      */
+
       if (session.black.rematchAccepted && session.white.rematchAccepted) {
         const gameSession = new GameSession(session);
         app.locals.gameSessions[gameSession.id] = gameSession; 
@@ -166,14 +173,21 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
         updateGameList();
         gameSession.onStateChange(() => updateGameList());
 
-        //res.redirect(`/game/${gameSession.id}`);
-
         session.black.emit('->rematch', {
+          newUrl: `/game/${gameSession.id}?jc=${gameSession.whiteJoinCode}`
+        });
+
+        session.white.emit('->rematch', {
+          newUrl: `/game/${gameSession.id}?jc=${gameSession.blackJoinCode}`
+        });
+
+        session.publish('rematch', {
+          newUrl: `/game/${gameSession.id}`
         });
       } else {
         participant.rematchAccepted = true;
 
-        this.broadcast(participant, 'rematchProposed', {
+        session.broadcast(participant, 'rematchProposed', {
           proposerName: participant.name,
           proposerId: participant.id,
           proposerColor: participant.color
