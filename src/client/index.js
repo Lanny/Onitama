@@ -80,6 +80,18 @@
       logger.info(`Game concluded because ${ msg.reason }`);
     });
 
+    socket.on('rematchProposed', function(msg) {
+      logger.info(`${msg.proposerName} has proposed a rematch. Click the "rematch" button to accept.`);
+    });
+
+    socket.on('->rematch', function(msg) {
+      window.location.assign(msg.newUrl);
+    });
+
+    socket.on('rematch', function(msg) {
+      window.location.assign(msg.newUrl);
+    });
+
     socket.on('disconnect', function(msg) {
       logger.info('Disconnected...');
     });
