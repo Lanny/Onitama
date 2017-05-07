@@ -139,7 +139,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
 
     on('requestRole', function(msg) {
       acquireSession(msg.gameSessionId);
-      participant = session.acceptParticipant(socket, msg.name);
+      participant = session.acceptParticipant(socket, msg.name, msg.joinCode);
     });
 
     on('requestRejoin', function(msg) {

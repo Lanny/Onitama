@@ -107,6 +107,77 @@
       }
     }
 
+    function bifurcate(str, sym) {
+      var idx = str.indexOf(sym);
+
+      if (idx === -1) {
+        return [str];
+      } else {
+        return [str.substring(0, idx), str.substring(idx + sym.length)];
+      }
+    }
+
+    function parseUrl(urlStr) {
+      var parsed = {};
+      var withoutProto, withoutHost, withoutPath, withoutQuery, query;
+
+      if (urlStr.indexOf('://') !== -1) {
+        [parsed.protocol, withoutProto] = bifurcate(urlStr, '://');
+      } else {
+        parsed.protocol = null;
+        withoutProto = urlStr;
+      }
+
+      [parsed.host, withoutHost] = bifurcate(withoutProto, '/');
+
+      if (!withoutHost)
+        return parsed;
+
+      var hasQuery, hasHash;
+      if (withoutHost.indexOf('?') !== -1) {
+        [parsed.path, withoutPath] = bifurcate(withoutHost, '?');
+
+        hasQuery = true;
+        hasHash = withoutPath.indexOf('#') !== -1 
+      } else if (withoutHost.indexOf('#') !== -1) {
+        [parsed.path, withoutPath] = bifurcate(withoutHost, '#');
+
+        withoutQuery = withoutPath;
+        hasQuery = false;
+        hasHash = true;
+      } else {
+        parsed.path = withoutHost;
+        return parsed;
+      }
+
+      if (hasQuery) {
+        var query;
+
+        [query, withoutQuery] = bifurcate(withoutPath, '#');
+
+        var pairs = query.split('&'),
+          queryMap = {};
+
+        for (var i=0; i<pairs.length; i++) {
+          var [key, val] = bifurcate(pairs[i], '=');
+
+          if (!(key in queryMap)) {
+            queryMap[key] = [];
+          }
+
+          queryMap[key].push(val);
+        }
+
+        parsed.query = queryMap;
+      }
+
+      if (hasHash) {
+        parsed.fragment = withoutQuery;
+      }
+
+      return parsed;
+    }
+
     const rank = ['1', '2', '3', '4', '5'],
       file = ['a', 'b', 'c', 'd', 'e'];
 
@@ -120,7 +191,8 @@
       clone,
       removeFromArray,
       niceName,
-      niceCoords
+      niceCoords,
+      parseUrl
     };
   }
 
