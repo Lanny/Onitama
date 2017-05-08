@@ -103,10 +103,11 @@ body {
   margin: 0;
 }
 
-h1 {
+.masthead h1 {
   text-shadow: 0px 1px 1px #4D4D4D;
   font-family: Helvetica, sans-serif;
   color: #222;
+  margin: 10px 8px;
 }
 
 .lobby {
@@ -114,7 +115,8 @@ h1 {
 }
 
 .landing-screen #rejoin-button,
-.lobby .new-game {
+.lobby .new-game,
+.new-game input[type="submit"]{
   padding: 10px 15px;
   border: 1px solid black;
   border-radius: 5px;
@@ -149,4 +151,17 @@ h1 {
 .lobby #game-table .no-games-row td {
   text-align: center;
   padding: 20px;
+}
+
+.new-game {
+  padding: 8px;
+}
+
+.new-game label {
+  display: block;
+  margin-bottom: 5px;
+}
+
+.new-game label span {
+  margin-right: 10px;
 }

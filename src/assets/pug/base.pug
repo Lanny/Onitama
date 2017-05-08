@@ -4,6 +4,10 @@ html
     title Onitama
     link(href="/static/css/style.css", rel="stylesheet")
   body
+    block masthead
+      .masthead
+        h1 ONITAMA
+  
     block content
 
     if ga_ua !== null

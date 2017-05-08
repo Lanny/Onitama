@@ -1,7 +1,7 @@
 ;(function() {
   function wrap(uuid, Participant, game, utils, AppError, cards,
                 {WHITE, BLACK, PARTICIPANT}) {
-    function GameSession(priorSession) {
+    function GameSession(priorSession, options={}) {
       this.white = null;
       this.black = null;
       this.whiteJoinCode = null;
@@ -12,7 +12,7 @@
       this.id = uuid();
       this.gameState = new game.GameState().initialize();
       this._stateChangeHandlers = [];
-      this._lockedName = null;
+      this._lockedName = options.name || null;
       this._lastSessionId = null;
 
       this.joinTime = 60 * 30;

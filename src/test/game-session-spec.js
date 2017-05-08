@@ -36,6 +36,14 @@
           expect(typeof ngs.whiteJoinCode).toBe('string');
           expect(typeof ngs.blackJoinCode).toBe('string');
         });
+
+        it('should accept a name option', function() {
+          var gs = new GameSession(undefined, {
+            name: 'the best game in the world'
+          });
+
+          expect(gs.getName()).toBe('the best game in the world');
+        });
       });
 
       describe('joining sequence', function() {

@@ -10,7 +10,17 @@ requirejs.config({
   }
 });
 
-function wrap(process, express, http, socketIo, path, pug, GameSession, ApplicationError, {WHITE, BLACK}) {
+function wrap(
+    process,
+    express,
+    bodyParser,
+    http,
+    socketIo,
+    path,
+    pug,
+    GameSession,
+    ApplicationError,
+    {WHITE, BLACK}) {
   const app = express(),
     server = http.Server(app),
     io = socketIo(server),
@@ -54,14 +64,26 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
   }
 
   app.use('/static', express.static(path.join(__dirname, '../../build/static')));
+  app.use(bodyParser.urlencoded({ extended:  true }));
 
   app.get('/', function(req, res) {
     const response = getTemplate('lobby.pug')({ ga_ua: GA_UA });
     res.send(response);
   });
   
-  app.get('/create-game', function(req, res) {
-    const gameSession = new GameSession();
+  app.get('/new-game', function(req, res) {
+    const response = getTemplate('new-game.pug')();
+    res.send(response);
+  });
+
+  app.post('/new-game', function(req, res) {
+    var options = {};
+
+    if (req.body.name && req.body.name.length) {
+      options.name = req.body.name.substring(0, 128);
+    }
+
+    const gameSession = new GameSession(null, options);
     app.locals.gameSessions[gameSession.id] = gameSession;
 
     updateGameList();
@@ -229,6 +251,7 @@ function wrap(process, express, http, socketIo, path, pug, GameSession, Applicat
 requirejs([
   'process',
   'express',
+  'body-parser',
   'http',
   'socket.io',
   'path',

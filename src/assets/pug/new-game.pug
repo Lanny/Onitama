@@ -1,0 +1,11 @@
+extends base
+block content
+  .new-game
+    form(method="POST" action="/new-game")
+      label
+        span Game Name:
+        input(type="text" name="name" maxlength="128")
+
+      input(type="submit" value="Create Game")
+
+  script(src="/static/js/require.js", data-main="/static/js/new-game")
