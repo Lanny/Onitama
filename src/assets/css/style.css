@@ -176,3 +176,7 @@ body {
   justify-content: space-around;
   box-sizing: border-box;
 }
+
+#card-select-list .card {
+  cursor: pointer;
+}
