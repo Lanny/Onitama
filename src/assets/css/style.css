@@ -165,3 +165,14 @@ body {
 .new-game label span {
   margin-right: 10px;
 }
+
+#card-select-list {
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  box-sizing: border-box;
+}
