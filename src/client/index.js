@@ -154,7 +154,6 @@
     // entry join screen and immidately enter game
     var query = utils.parseUrl(document.location.href).query;
 
-    console.log(query);
     if (query && query.jc && query.jc.length) {
       // We do!
       socket.emit('requestRole', {

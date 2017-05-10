@@ -166,7 +166,7 @@ body {
   margin-right: 10px;
 }
 
-#card-select-list {
+.new-game #card-select-list {
   list-style: none;
   padding: 10px;
   margin: 0;
@@ -177,6 +177,10 @@ body {
   box-sizing: border-box;
 }
 
-#card-select-list .card {
+.new-game #card-select-list .card {
   cursor: pointer;
+}
+
+.new-game #card-selection-inputs {
+  display: none;
 }

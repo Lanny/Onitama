@@ -1,16 +1,11 @@
 ;(function() {
-  requirejs.config({
-    paths: {
-      'socket.io': '/socket.io/socket.io'
-    }
-  });
-
   requirejs([
     'd3',
     'cards',
     'client-utils'
   ], function(d3, cards, {rectify, drawCard}) {
-    const cardList = d3.select('#card-select-list');
+    const cardList = d3.select('#card-select-list'),
+      cardInputs = d3.select('#card-selection-inputs');
     var selection = cards.deck.map(c => c.group === 'Arcane Wonders');
 
     function rectifySelection(cardSelection, cardList) {
@@ -30,6 +25,13 @@
               rectifySelection(cardSelection, cardList);
             });
         }));
+
+      rectify(cardInputs, 'input', selection,
+        selection => selection
+          .attr('type', 'checkbox')
+          .attr('name', 'card-name')
+          .attr('value', (d, i) => cardSelection[i])
+          .property('checked', d => d ))
     }
 
     rectifySelection(selection, cardList);
