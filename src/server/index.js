@@ -71,12 +71,12 @@ function wrap(
       options.name = params.name.substring(0, 128);
     }
 
-    if (!Array.isArray(params['card-name'])) {
+    if (!Array.isArray(params['card-id'])) {
       throw new ApplicationError('Must provide `card-name` options', 'FORM');
     }
 
-    const cardNames = new Set(params['card-name']);
-    options.deck = cards.deck.filter(c => cardNames.has(c.name));
+    const cardIds = new Set(params['card-id']);
+    options.deck = cards.deck.filter(c => cardIds.has(c.getId()));
 
     if (options.deck.length < 5) {
       throw new ApplicationError('Insufficient number of cards selected.', 'FORM');

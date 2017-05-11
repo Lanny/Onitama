@@ -29,8 +29,8 @@
       rectify(cardInputs, 'input', selection,
         selection => selection
           .attr('type', 'checkbox')
-          .attr('name', 'card-name')
-          .attr('value', (d, i) => cards.deck[i].name)
+          .attr('name', 'card-id')
+          .attr('value', (d, i) => cards.deck[i].getId())
           .property('checked', d => d ))
     }
 

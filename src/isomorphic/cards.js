@@ -17,6 +17,7 @@
           moves: this._moves,
           hand: this.hand,
           group: this.group,
+          id: this.getId,
           type: 'SIMPLE'
         };
       },
@@ -26,6 +27,9 @@
         }
 
         return this.hand.substring(0,5);
+      },
+      getId: function() {
+        return `simple:${this.group}:${this.name}`;
       }
     };
 
@@ -59,6 +63,8 @@
         throw Error(`Can not load card type: ${ description.type }`);
       }
     }
+
+    var cardIdSet = new Set();
 
     return {
       deck: cards,
