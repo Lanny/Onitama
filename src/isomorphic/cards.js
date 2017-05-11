@@ -49,7 +49,14 @@
       new SimpleCard('Rabbit','Arcane Wonders',  [[-1,-1], [1,1], [2,0]]),
       new SimpleCard('Rooster','Arcane Wonders',  [[-1,-1], [-1,0], [1,0], [1,1]]),
       new SimpleCard('Ox','Arcane Wonders',  [[0,1], [0,-1], [1,0]]),
-      new SimpleCard('Cobra','Arcane Wonders',  [[-1,0], [1,1], [1,-1]])
+      new SimpleCard('Cobra','Arcane Wonders',  [[-1,0], [1,1], [1,-1]]),
+      new SimpleCard('Fer-de-lance', 'Extended', [[0, 2]]),
+      new SimpleCard('Skunk', 'Extended', [[0, 1], [0, -1]]),
+      new SimpleCard('Dragonfly', 'Extended', [[1, 1], [-1, 1], [-2, 0], [2, 0]]),
+      new SimpleCard('Butterfly', 'Extended', [[1, -1], [-1, -1], [-2, 0], [2, 0]]),
+      new SimpleCard('Dugong', 'Extended', [[1,0],[-1,1], [-1,-1]]),
+      new SimpleCard('Zebra', 'Extended', [[1,1],[1,0],[1,-1]]),
+      new SimpleCard('Crocodile', 'Extended', [[1,1],[0,1],[-1,1]]),
     ];
 
     function loadCard(description) {
