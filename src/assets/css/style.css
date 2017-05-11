@@ -184,3 +184,10 @@ body {
 .new-game #card-selection-inputs {
   display: none;
 }
+
+.card text {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

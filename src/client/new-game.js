@@ -13,17 +13,18 @@
         selection => selection.each((data, i, nodes) => {
           const svg = d3.select(nodes[i])
             .attr('viewBox', '-5 -5 260 135')
-            .style('width', '250px');
+            .style('width', '250px')
+            .on('click', () => {
+              cardSelection[i] = !cardSelection[i];
+              rectifySelection(cardSelection, cardList);
+            });
+
 
           drawCard(svg, cards.deck[i]);
 
           svg.select('.background')
             .attr('stroke', data ? 'green' : 'black')
-            .attr('stroke-width', data ? 5 : 1)
-            .on('click', () => {
-              cardSelection[i] = !cardSelection[i];
-              rectifySelection(cardSelection, cardList);
-            });
+            .attr('stroke-width', data ? 5 : 1);
         }));
 
       rectify(cardInputs, 'input', selection,
