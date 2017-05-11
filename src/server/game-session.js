@@ -2,8 +2,6 @@
   function wrap(uuid, Participant, game, utils, AppError, cards,
                 {WHITE, BLACK, PARTICIPANT}) {
     function GameSession(priorSession, options={}) {
-      const deck = options.deck ? options.deck : cards.deck;
-
       this.white = null;
       this.black = null;
       this.whiteJoinCode = null;
@@ -12,7 +10,7 @@
       this.observers = [];
       this.purgatory = [];
       this.id = uuid();
-      this.gameState = new game.GameState().initialize(deck);
+      this.deck = options.deck ? options.deck : cards.deck;
       this._stateChangeHandlers = [];
       this._lockedName = options.name || null;
       this._lastSessionId = null;
@@ -27,8 +25,10 @@
         this._lastSessionId = priorSession.id;
         this.whiteJoinCode = uuid();
         this.blackJoinCode = uuid();
+        this.deck = priorSession.deck;
       }
 
+      this.gameState = new game.GameState().initialize(this.deck);
       this.bumpMoveTimer();
     }
 

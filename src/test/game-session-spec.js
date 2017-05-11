@@ -1,5 +1,5 @@
 ;(function() {
-  function wrap(GameSession, Mocket, {WHITE, BLACK, PARTICIPANT}) {
+  function wrap(GameSession, cards, Mocket, {WHITE, BLACK, PARTICIPANT}) {
     describe('game-session', function() {
       it('should be a constructor', function() {
         expect(typeof GameSession).toBe('function');
@@ -43,6 +43,16 @@
           });
 
           expect(gs.getName()).toBe('the best game in the world');
+        });
+
+        it('should inherit the deck of a prior session', function() {
+          const deck = cards.deck.filter(c => c.group === 'Extended'),
+            ogs = new GameSession(null, {deck: deck}),
+            ngs = new GameSession(ogs);
+
+          for (var i=0; i<ogs.deck.length; i++) {
+            expect(ngs.deck[i].getId()).toEqual(ogs.deck[i].getId());
+          }
         });
       });
 
@@ -153,6 +163,7 @@
 
   define([
     'game-session',
+    'cards',
     'mocket',
     'colors'
   ], wrap);
