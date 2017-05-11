@@ -16,6 +16,7 @@
           name: this.name,
           moves: this._moves,
           hand: this.hand,
+          group: this.group,
           type: 'SIMPLE'
         };
       },
@@ -51,6 +52,7 @@
       if (description.type === 'SIMPLE') {
         return new SimpleCard(
           description.name,
+          description.group,
           description.moves,
           description.hand);
       } else {

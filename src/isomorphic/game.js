@@ -76,7 +76,7 @@
     }
 
     GameState.prototype = {
-      initialize() {
+      initialize(deck) {
         this.board = [
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
@@ -85,7 +85,7 @@
           [ new Student(WHITE), null, null, null, new Student(BLACK) ],
         ];
 
-        this.deck = shuffle(cards.deck).splice(0, 5);
+        this.deck = shuffle(deck).splice(0, 5);
         this.deck[0].hand = 'WHITE0';
         this.deck[1].hand = 'WHITE1';
         this.deck[2].hand = 'BLACK0';

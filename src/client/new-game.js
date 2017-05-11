@@ -30,7 +30,7 @@
         selection => selection
           .attr('type', 'checkbox')
           .attr('name', 'card-name')
-          .attr('value', (d, i) => cardSelection[i])
+          .attr('value', (d, i) => cards.deck[i].name)
           .property('checked', d => d ))
     }
 

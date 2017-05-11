@@ -18,6 +18,7 @@ function wrap(
     socketIo,
     path,
     pug,
+    cards,
     GameSession,
     ApplicationError,
     {WHITE, BLACK}) {
@@ -63,6 +64,27 @@ function wrap(
     lobbyNS.emit('gameList', { games: serializeGameList() });
   }
 
+  function validateNewGameParams(params) {
+    var options = {};
+
+    if (params.name && params.name.length) {
+      options.name = params.name.substring(0, 128);
+    }
+
+    if (!Array.isArray(params['card-name'])) {
+      throw new ApplicationError('Must provide `card-name` options', 'FORM');
+    }
+
+    const cardNames = new Set(params['card-name']);
+    options.deck = cards.deck.filter(c => cardNames.has(c.name));
+
+    if (options.deck.length < 5) {
+      throw new ApplicationError('Insufficient number of cards selected.', 'FORM');
+    }
+
+    return options;
+  }
+
   app.use('/static', express.static(path.join(__dirname, '../../build/static')));
   app.use(bodyParser.urlencoded({ extended:  true }));
 
@@ -77,15 +99,10 @@ function wrap(
   });
 
   app.post('/new-game', function(req, res) {
-    var options = {};
+    const options = validateNewGameParams(req.body),
+      gameSession = new GameSession(null, options);
 
-    if (req.body.name && req.body.name.length) {
-      options.name = req.body.name.substring(0, 128);
-    }
-
-    const gameSession = new GameSession(null, options);
     app.locals.gameSessions[gameSession.id] = gameSession;
-
     updateGameList();
     gameSession.onStateChange(() => updateGameList());
 
@@ -256,6 +273,7 @@ requirejs([
   'socket.io',
   'path',
   'pug',
+  'cards',
   'game-session',
   'application-error',
   'colors'
