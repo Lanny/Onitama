@@ -284,6 +284,9 @@
 
         return combinedMoveList;
       },
+      isPassAvailable: function() {
+        throw new Error('lol');
+      },
       start: function() {
         this.started = true;
         this._executeStateChange({

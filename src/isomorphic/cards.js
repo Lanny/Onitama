@@ -71,10 +71,22 @@
       }
     }
 
-    var cardIdSet = new Set();
+    var cardById = {};
+    for (var i=0; i<cards.length; i++) {
+      let id = cards[i].getId();
+      if (id in cardById)
+        throw new Error(`Two cards with the id ${id} found.`);
+
+      cardById[id] = cards[i];
+    }
+
+    function getCard(cardId) {
+      return cardById[cardId];
+    }
 
     return {
       deck: cards,
+      getCard: getCard,
       loadCard: loadCard
     };
   }
