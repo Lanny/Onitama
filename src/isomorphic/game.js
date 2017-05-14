@@ -285,7 +285,12 @@
         return combinedMoveList;
       },
       isPassAvailable: function() {
-        return '42';
+        const numMoves = this.getPieces()
+          .filter(({piece}) => piece.getColor() === this.currentTurn)
+          .map(({x, y}) => this.gatherMoves([x, y]).length)
+          .reduce((l, r) => l + r, 0);
+
+        return numMoves < 1;
       },
       start: function() {
         this.started = true;
