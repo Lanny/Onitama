@@ -285,7 +285,7 @@
         return combinedMoveList;
       },
       isPassAvailable: function() {
-        throw new Error('lol');
+        return '42';
       },
       start: function() {
         this.started = true;
