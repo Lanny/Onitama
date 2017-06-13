@@ -10,7 +10,7 @@ npm install
 npm install -g gulp-cli # If you haven't installed gulp-cli before
 gulp server
 
-* Requires node version 6 or higher *
+* Requires node version 6 or higher to support es6 *
 ```
 
 And navigate to localhost:3000
