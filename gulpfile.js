@@ -80,6 +80,7 @@ gulp.task('_test', function() {
     baseUrl: path.join(__dirname, 'src/server'),
     paths: {
       'game': '../isomorphic/game',
+      'minimax-ai': '../isomorphic/minimax-ai',
       'colors': '../isomorphic/colors',
       'cards': '../isomorphic/cards',
       'utils': '../isomorphic/utils',

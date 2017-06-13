@@ -185,6 +185,10 @@
       return `${ rank[x] }${ file[y] }`;
     }
 
+    function flattenReduce(acc, arr) {
+      return acc.concat(arr);
+    }
+
     return {
       Matrix,
       arrayEquals,
@@ -192,7 +196,8 @@
       removeFromArray,
       niceName,
       niceCoords,
-      parseUrl
+      parseUrl,
+      flattenReduce
     };
   }
 
