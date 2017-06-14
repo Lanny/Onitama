@@ -6,7 +6,14 @@
       SKEW: 0,
     };
 
-    function baseEvalState(perspective, weights, gameState) {
+    function branchAndMove(move, gameState) {
+      var branch = gameState.branch();
+      move.card = branch.localizeCard(move.card);
+      branch.executeMove(move.sourceCell, move.targetCell, move.card);
+      return branch;
+    }
+
+    function baseEvalState(perspective, gameState, weights=defaultWeights) {
       var value = 0;
 
       if (gameState.winner === perspective) {
@@ -16,18 +23,50 @@
       }
 
       gameState.getPieces()
-        .forEaach(({piece}) => {
+        .forEach(({piece}) => {
           if (piece.color === perspective) {
-            value += defaultWeights.pawn;
+            value += weights.PAWN;
           } else {
-            value -= defaultWeights.pawn;
+            value -= weights.PAWN;
           }
         });
 
       return value;
     }
 
-    function recursiveBestMove(weights, gameState, depth) {
+    function evalMove(move, gameState, depth, weights=defaultWeights) {
+      const branch = branchAndMove(move, gameState),
+        perspective = gameState.currentTurn;
+
+      if (depth <= 0) {
+        move.value = baseEvalState(perspective, branch, weights);
+      } else {
+        const opponentMove = recursiveBestMove(branch, depth-1, weights);
+
+        if (opponentMove === null) {
+          move.value = baseEvalState(perspective, branch, weights);
+          return move;
+        }
+
+        const branch2 = branchAndMove(opponentMove, branch),
+          followupMove = recursiveBestMove(branch2, depth-2, weights);
+
+        if (followupMove === null) {
+          move.value = baseEvalState(perspective, branch, weights);
+          return move;
+        }
+
+        move.value = followupMove.value;
+      }
+
+      return move;
+    }
+
+    function recursiveBestMove(gameState, depth, weights=defaultWeights) {
+      if (gameState.winner) {
+        return null;
+      }
+
       const possibleMoves = gameState.getPieces()
         .filter(cell => cell.piece.getColor() === gameState.currentTurn)
         .map(cell => {
@@ -43,16 +82,14 @@
                 };
               })
               .reduce(utils.flattenReduce, []);
-          });
+            })
+            .reduce(utils.flattenReduce, []);
         })
-        .reduce(utils.flattenReduce, []);
+        .reduce(utils.flattenReduce, [])
+        .map(move => evalMove(move, gameState, depth-1, weights))
+        .sort((l, r) => r.value - l.value);
 
-      console.log(possibleMoves);
-
-      if (depth <= 0) {
-        return baseEvalState(gameState.currentTurn, weights, gameState);
-      }
-
+      return possibleMoves[0];
     }
 
     return {

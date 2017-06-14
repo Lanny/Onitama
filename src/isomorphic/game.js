@@ -145,7 +145,7 @@
         }
 
         const cardWorks = !!(move.cards
-          .filter(moveCard => moveCard === card)
+          .filter(moveCard => moveCard.getId() === card.getId())
           .length);
 
         if (!cardWorks) {
@@ -211,7 +211,9 @@
             winner: this.winner
           });
         }
-
+      },
+      branch() {
+        return new GameState().loadState(this.serialize());
       },
       getPieces() {
         var pieces = [];

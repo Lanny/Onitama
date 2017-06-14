@@ -1,8 +1,8 @@
 ;(function() {
-  function wrap(game, minimaxAI) {
+  function wrap(game, utils, minimaxAI) {
     describe('minimax-ai', function() {
       describe('recursiveBestMove', function() {
-        var testGameData = {
+        var obviousGameData = {
           "board": [
             [
               { "color": "WHITE", "type": "STUDENT" },
@@ -20,10 +20,10 @@
               { "color": "BLACK", "type": "STUDENT" }
             ],
             [
+              null,
+              null,
+              null,
               { "color": "WHITE", "type": "MASTER" },
-              null,
-              null,
-              null,
               { "color": "BLACK", "type": "MASTER" }
             ],
             [
@@ -84,9 +84,12 @@
           "terminated": null
         };
 
-        it('blah', function() {
-          const gs = new game.GameState().loadState(testGameData);
-          minimaxAI.recursiveBestMove(minimaxAI.defaultWeights, gs, 1);
+        it('makes the super obvious move', function() {
+          const gs = new game.GameState().loadState(obviousGameData),
+            move = minimaxAI.recursiveBestMove(gs, 5);
+
+          expect(utils.arrayEquals(move.sourceCell, [2,3])).toBe(true);
+          expect(utils.arrayEquals(move.targetCell, [2,4])).toBe(true);
         });
       });
     });
@@ -94,6 +97,7 @@
 
   define([
     'game',
+    'utils',
     'minimax-ai'
   ], wrap);
 })();
