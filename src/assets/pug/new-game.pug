@@ -6,8 +6,19 @@ block content
         span Game Name:
         input(type="text" name="name" maxlength="128")
 
-      div#card-select-list
-      div#card-selection-inputs
+      #card-select-list
+      #card-selection-inputs
+
+      #opponent
+        span.label Opponent
+        label
+          input(type="radio", name="opponent", value="human", selected="selected")
+          span Human
+
+        label
+          input(type="radio", name="opponent", value="ai")
+          span AI
+        
 
       input(type="submit" value="Create Game")
 
