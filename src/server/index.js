@@ -6,7 +6,8 @@ requirejs.config({
     'game': '../isomorphic/game',
     'colors': '../isomorphic/colors',
     'cards': '../isomorphic/cards',
-    'utils': '../isomorphic/utils'
+    'utils': '../isomorphic/utils',
+    'minimax-ai': '../isomorphic/minimax-ai'
   }
 });
 
@@ -21,6 +22,7 @@ function wrap(
     cards,
     GameSession,
     ApplicationError,
+    AIPlayer,
     {WHITE, BLACK}) {
   const app = express(),
     server = http.Server(app),
@@ -82,6 +84,12 @@ function wrap(
       throw new ApplicationError('Insufficient number of cards selected.', 'FORM');
     }
 
+    if ((new Set(['human', 'ai'])).has(params.opponent)) {
+      options.opponent = params.opponent;
+    } else {
+      options.opponent = 'human';
+    }
+
     return options;
   }
 
@@ -106,6 +114,10 @@ function wrap(
     updateGameList();
     gameSession.onStateChange(() => updateGameList());
 
+    if (options.opponent === 'ai') {
+      const opponent = new AIPlayer(gameSession);
+    }
+    
     res.redirect(`/game/${gameSession.id}`);
   });
 
@@ -276,5 +288,6 @@ requirejs([
   'cards',
   'game-session',
   'application-error',
+  'ai-player',
   'colors'
 ], wrap);
