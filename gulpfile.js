@@ -44,12 +44,14 @@ gulp.task('css', function() {
     .pipe(gulp.dest('build/static/css'));
 });
 
-gulp.task('generate', ['js', 'svg', 'css', 'mp3'], function() { });
+gulp.task('generate', gulp.parallel('js', 'svg', 'css', 'mp3', function(done) {
+  done();
+}));
 
-gulp.task('server', ['generate'], function() {
-  gulp.watch(clientJsFiles, ['js']);
-  gulp.watch(svgFiles, ['svg']);
-  gulp.watch(cssFiles, ['css']);
+gulp.task('server', gulp.series('generate', function() {
+  gulp.watch(clientJsFiles, gulp.series('js'));
+  gulp.watch(svgFiles, gulp.series('svg'));
+  gulp.watch(cssFiles, gulp.series('css'));
 
   return nodemon({
     script: 'src/server/index.js',
@@ -60,7 +62,7 @@ gulp.task('server', ['generate'], function() {
       'src/assets/pug/'
     ]
   });
-});
+}));
 
 gulp.task('_test', function() {
   var jasmine = new Jasmine();
@@ -115,8 +117,8 @@ gulp.task('_test', function() {
     }));
 });
 
-gulp.task('test:watch', ['_test'], function() {
+gulp.task('test:watch', gulp.series('_test', function() {
   gulp.watch(allJsFiles, ['_test']);
-});
+}));
 
-gulp.task('test:once', ['_test'], function() { });
+gulp.task('test:once', gulp.series('_test', function() { }));
