@@ -55,7 +55,11 @@
           () => setTimeout(() => this._makeNextMoveMaybe(), 500));
       },
       _makeNextMoveMaybe: function() {
-        if (!this.gameSession.gameState.currentTurn === this.participant.color) {
+        const gs = this.gameSession.gameState;
+
+        if (gs.currentTurn !== this.participant.color ||
+            gs.winner ||
+            gs.terminated) {
           return;
         }
 
