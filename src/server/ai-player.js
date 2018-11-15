@@ -40,6 +40,7 @@
 
     function AIPlayer(gameSession) {
       this.gameSession = gameSession;
+      this.name = 'Lenny';
       this.init();
     }
 
@@ -57,9 +58,10 @@
       _makeNextMoveMaybe: function() {
         const gs = this.gameSession.gameState;
 
-        if (gs.currentTurn !== this.participant.color ||
-            gs.winner ||
-            gs.terminated) {
+        if (gs.winner) {
+          this.gameSession.submitChatMessage(this, 'ggs my dude');
+          return;
+        } else if (gs.currentTurn !== this.participant.color || gs.terminated) {
           return;
         }
 
