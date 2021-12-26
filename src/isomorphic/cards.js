@@ -45,7 +45,7 @@
       new SimpleCard('Frog','Arcane Wonders',  [[-2,0], [-1,1], [1,-1]]),
       new SimpleCard('Goose','Arcane Wonders',  [[-1,1],[-1,0],[1,0],[1,-1]]),
       new SimpleCard('Horse','Arcane Wonders',  [[-1,0], [0, 1], [0, -1]]),
-      new SimpleCard('Eel','Arcane Wonders',  [[-1,1], [-1,-1], [0,1]]),
+      new SimpleCard('Eel','Arcane Wonders',  [[-1,1], [-1,-1], [1,0]]),
       new SimpleCard('Rabbit','Arcane Wonders',  [[-1,-1], [1,1], [2,0]]),
       new SimpleCard('Rooster','Arcane Wonders',  [[-1,-1], [-1,0], [1,0], [1,1]]),
       new SimpleCard('Ox','Arcane Wonders',  [[0,1], [0,-1], [1,0]]),
