@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "gulp test:once",
-    "start": "node src/server/index.js",
-    "postinstall": "gulp generate"
+    "start": "node src/server/index.js"
   },
   "repository": {
     "type": "git",
